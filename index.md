@@ -6,6 +6,6 @@ Homepage content goes here.
 
 * github file editor can be used with markdown formatting
 
-** subheading
+<h1> heading </h1>
 
 *italicized* 
