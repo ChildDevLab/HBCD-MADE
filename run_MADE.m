@@ -67,27 +67,6 @@ function run_MADE(output_dir_name, bids_dir, participant_label, ...
 %addpath(genpath('/home/faird/shared/data/TOTS_UMD_collab/code/cdl-eeg-processing/MADE-EEG-preprocessing-pipeline'))
 %addpath(genpath('/home/faird/shared/data/TOTS_UMD_collab/code/cdl-eeg-processing/MADE-EEG-preprocessing-pipeline/eeglab2021.0'));% enter the path of the EEGLAB folder in this line
 
-%% TM - move corrupted/unusable files out of raw data location into new folder - 8/9/2024
-% In future updates, this section will be moved to a separate script
-% Participants CHPUP0024 and CHNWU0021 -- unusable RS run 1 data
-% move bad files to separate folder and do not process
-% code can be modified and copied for other participants, please run this
-% code only in this section (before reading datafile_names)
-if (participant_label == 'sub-856295') | (participant_label == 'sub-676980')
-    newfolder = strcat(bids_dir,'\', participant_label, '\', session_label, '\eeg', '\unusedRawData');
-    if exist(newfolder, 'dir') == 0
-        mkdir(newfolder);
-    end
-    filesList = dir(strcat(bids_dir,'\', participant_label, '\', session_label, '\eeg')); % get list of all files in directory
-    for i = 1:length(filesList)
-        if contains(filesList(i).name, 'RS_acq-eeg_run-01') %move RS run 1
-            name = filesList(i).name;
-            movefile(strcat(bids_dir,'\', participant_label, '\', session_label, '\eeg\', name), strcat(newfolder, '\', name));
-        end
-    end
-    cd(output_dir_name); %go back to the right folder
-end
-
 %% Read files to analyses
 %datafile_names=dir(rawdata_location);
 
@@ -126,39 +105,6 @@ for run=1:length(datafile_names)
 %     EEG = pop_biosig([rawdata_location, filesep, datafile_names{run}]);
 %     EEG = eeg_checkset(EEG);
 %     EEG = pop_select( EEG,'nochannel', 65:72); % delete redundant channels
-
-    %% TM - individual files raw data fixes 8/8/2024
-    % CHPHI0011 -- remove corrupted data marked by DrpS flag and add boundary
-    % markers in each task
-    if sub_id == 'sub-447585' 
-        % check what task we're on, add boundary marker per task if not
-        % already there (will just replace if it is already there)
-        if numel(find(strcmp({EEG.event.type}, 'bas+')))>0 %RS
-            EEG = pop_editeventvals(EEG,'add',{1 [] [] []},'changefield',{1 'latency' 2.189}, 'changefield', {1, 'sample' 2189}, 'changefield', {1, 'onset' 2.189},'changefield',{1 'type' 'boundary'}); 
-        end
-        if numel(find(strcmp({EEG.event.type}, 'stm+')))>0 %FACE
-            EEG = pop_editeventvals(EEG,'add',{1 [] [] []},'changefield',{1 'latency' 4.763}, 'changefield', {1, 'sample' 4763}, 'changefield', {1, 'onset' 4.763},'changefield',{1 'type' 'boundary'}); 
-        end
-        if numel(find(strcmp({EEG.event.type}, 'ch1+')))>0 %VEP
-            EEG = pop_editeventvals(EEG,'add',{1 [] [] []},'changefield',{1 'latency' 4.660}, 'changefield', {1, 'sample' 30724}, 'changefield', {1, 'onset' 3.724},'changefield',{1 'type' 'boundary'}); 
-        end
-        %remove corrupted data around DrpS flag
-        if numel(find(strcmp({EEG.event.type}, 'DrpS')))>0
-            EEG = pop_select(EEG, 'rmtime', [51 72]);
-            EEG = eeg_checkset( EEG );
-        end
-    end
-
-    % CHCHL0083 -- delete extra DIN3s out of raw data, only keep DIN3 at
-    % ~80ms, hardware error where extra dins were inserted and eprime flags
-    % were missing
-    % this DIN3 was chosen after watching the recorded video and estimating which
-    % DIN3 is closest to the start of the task
-    if sub_id == 'sub-437500'
-        if numel(find(strcmp(EEG.event(1).Task, 'RS')))>0 %find RS using task label
-            EEG = pop_editeventvals(EEG, 'delete', [18, 16, 15, 14, 12, 11]);
-        end
-    end
 
     %% TM - 8/6/2024: Impedances catch
     % Check if impedances were turned on and off -- if so pop out the
@@ -522,10 +468,10 @@ for run=1:length(datafile_names)
     %% Step 6.5: Save individual files
     if output_format==1
         EEG = eeg_checkset( EEG );
-        EEG = pop_editset(EEG, 'setname', strrep(datafile_names{run}, ext, '_filtered_data'));
-        EEG = pop_saveset( EEG,'filename',strrep(datafile_names{run}, ext, '_filtered_data.set'),'filepath', [output_location filesep 'filtered_data' filesep]); % save .set format
+        EEG = pop_editset(EEG, 'setname', strrep(datafile_names{run}, ext, '_desc-filtered_eeg'));
+        EEG = pop_saveset( EEG,'filename',strrep(datafile_names{run}, ext, '_desc-filtered_eeg.set'),'filepath', [output_location filesep 'filtered_data' filesep]); % save .set format
     elseif output_format==2
-        save([[output_location filesep 'filtered_data' filesep ] strrep(datafile_names{run}, ext, '_filtered_data.mat')], 'EEG'); % save .mat format
+        save([[output_location filesep 'filtered_data' filesep ] strrep(datafile_names{run}, ext, '_desc-filtered_eeg.mat')], 'EEG'); % save .mat format
     end
     
 end
@@ -802,9 +748,9 @@ EEG_copy = eeg_checkset(EEG_copy);
 
 if size(EEG_copy.icaweights,1) == size(EEG_copy.icaweights,2)
     if save_interim_result==1
-        badICs = adjusted_ADJUST(EEG_copy, [[output_location filesep 'ica_data' filesep] subses '_adjust_report']);
+        badICs = adjusted_ADJUST(EEG_copy, [[output_location filesep 'ica_data' filesep] subses '_adjustReport']);
     else
-        badICs = adjusted_ADJUST(EEG_copy, [[output_location filesep 'processed_data' filesep] strrep(datafile_names{run}, ext, '_adjust_report')]);
+        badICs = adjusted_ADJUST(EEG_copy, [[output_location filesep 'processed_data' filesep] strrep(datafile_names{run}, ext, '_adjustReport')]);
     end
     close all;
 else % if rank is less than the number of electrodes, throw a warning message
@@ -831,10 +777,10 @@ end
 if save_interim_result==1
     if output_format==1
         EEG = eeg_checkset(EEG);
-        EEG = pop_editset(EEG, 'setname',  [subses '_ica_data']);
-        EEG = pop_saveset(EEG, 'filename', [subses '_ica_data.set'],'filepath', [output_location filesep 'ica_data' filesep ]); % save .set format
+        EEG = pop_editset(EEG, 'setname',  [subses 'desc-mergedICA_eeg']);
+        EEG = pop_saveset(EEG, 'filename', [subses '_desc-mergedICA_eeg.set'],'filepath', [output_location filesep 'ica_data' filesep ]); % save .set format
     elseif output_format==2
-        save([output_location filesep 'ica_data' filesep subses '_ica_data.mat'], 'EEG'); % save .mat format
+        save([output_location filesep 'ica_data' filesep subses 'desc-mergedICA_eeg.mat'], 'EEG'); % save .mat format
     end
 end
 
@@ -1133,40 +1079,64 @@ for run = 1 : length(event_struct.file_names)
     save_name_jpg = [name '.jpeg'];
     save_path = [output_location filesep 'processed_data' filesep ];
     
-    if contains(event_struct.file_names{run}, 'MMN')
-        try
-            computeSME(EEG, event_struct.file_names{run}, json_settings_file, 'MMN', output_location, participant_label, session_label)
-            MMN_ERP_Topo_Indv();
-            clear allData;
-        catch
-            continue
-        end
-    elseif contains(event_struct.file_names{run}, 'RS')
-        try
-            RS_ERP_Topo_Indv();
-            clear allData;
-        catch
-            continue
-        end
-    elseif contains(event_struct.file_names{run}, 'VEP')
-        try
-            computeSME(EEG, event_struct.file_names{run}, json_settings_file, 'VEP', output_location, participant_label, session_label)
-            VEP_ERP_Topo_Indv();
-            clear allData;
-        catch
-            continue
-        end
-    elseif contains(event_struct.file_names{run}, 'FACE')
-        try
-            computeSME(EEG, event_struct.file_names{run}, json_settings_file, 'FACE', output_location, participant_label, session_label)
-            FACE_ERP_Topo_Indv();
-            clear allData;
-        catch
-            continue
-        end
-    end
-    
-    
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % Age edits - ADDED Kira 12/20/2024
+% 
+%     try
+%         % on cbrain, look for scans.tsv
+%         tsvpath= [bids_dir filesep participant_label filesep session_label];
+%         agetable = readtable([tsvpath filesep participant_label '_' session_label '_scans.tsv'],"Filetype","text",'Delimiter','\t');
+%         try
+%             taskages=agetable.age(contains(agetable.filename,'eeg'));
+%             age = taskages(1)*12;   
+%         catch
+%             error("Age data is missing!")
+%         end
+% 
+%     catch
+%         % locally, use participants.tsv
+%         agetable = readtable([bids_dir filesep 'participants.tsv'],"Filetype","text",'Delimiter','\t');
+%         try
+%             age = agetable.age(strcmp(agetable.participant_id, participant_label))*12; %if age is given in years?
+%         catch
+%             error("Age data is missing!")
+%         end
+%     end
+% 
+%     if contains(event_struct.file_names{run}, 'MMN')
+%         try
+%             computeSME(EEG, event_struct.file_names{run}, json_settings_file, 'MMN', output_location, participant_label, session_label, age)
+%             MMN_ERP_Topo_Indv();
+%             clear allData;
+%         catch
+%             continue
+%         end
+%     elseif contains(event_struct.file_names{run}, 'RS')
+%         try
+%             RS_ERP_Topo_Indv();
+%             clear allData;
+%         catch
+%             continue
+%         end
+%     elseif contains(event_struct.file_names{run}, 'VEP')
+%         try
+%             computeSME(EEG, event_struct.file_names{run}, json_settings_file, 'VEP', output_location, participant_label, session_label, age)
+%             VEP_ERP_Topo_Indv();
+%             clear allData;
+%         catch
+%             continue
+%         end
+%     elseif contains(event_struct.file_names{run}, 'FACE')
+%         try
+%             computeSME(EEG, event_struct.file_names{run}, json_settings_file, 'FACE', output_location, participant_label, session_label, age)
+%             FACE_ERP_Topo_Indv();
+%             clear allData;
+%         catch
+%             continue
+%         end
+%     end
+% 
+% 
     
 end % end of run loop
 
@@ -1178,7 +1148,7 @@ report_table=table(datafile_names', sub_id', Tasks', lineNoise, reference_used_f
 report_table.Properties.VariableNames={'datafile_name','subject_id', 'task', 'line_noise','reference_for_faster', 'faster_bad_channels', ...
     'ica_prep_bad_channels', 'length_ica_data', 'total_ICs', 'ICs_removed', 'total_epochs_pre_artifact_rej', ...
     'total_epochs_post_artifact_rej', 'FACE_UpInv','FACE_Inv', 'FACE_Obj', 'FACE_UpObj', 'MMN_Standard', 'MMN_PreDev', 'MMN_Dev','total_channels_interp', 'avg_chan_interp_artifact_rej', 'std_chan_interp_artifact_rej', 'range_chan_interp_artifact_rej'};
-writetable(report_table, fullfile(output_location, [participant_label '_' session_label '_acq-eeg_MADE_preprocessing_report.csv']));
+writetable(report_table, fullfile(output_location, [participant_label '_' session_label '_acq-eeg_preprocessingReport.csv']));
 
 %%% Delete the interem results if the user doesnt want them
 if save_interim_result == 0
