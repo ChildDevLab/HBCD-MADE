@@ -54,6 +54,244 @@ These supported global settings are specified in the proc_settings_HBCD_containe
 
 - output_format: (binary 1 or 2) 1 = .set; 2 = .mat
 
+## EEG Acquisition Flag Descriptions
+
+### EEG Acquisition Flags for V03, V04, and V06
+
+
+#### Resting State (RS)
+
+<table>
+    <tr>
+        <th>Flag</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>Bgn+</td>
+        <td>Start of task</td>
+    </tr>
+    <tr>
+        <td>bas+</td>
+        <td>Start of RS video</td>
+    </tr>
+    <tr>
+        <td>DIN3</td>
+        <td>StimTracker flag for visual stimuli</td>
+    </tr>
+    </tr>
+        <td>TRSP</td>
+        <td>End of stimulus presentation, contains additional stimulus information</td>
+    </tr>
+</table>
+
+
+
+#### Visual Evoked Potential (VEP)
+
+<table>
+    <tr>
+        <th>Flag</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>Bgn+</td>
+        <td>Start of task</td>
+    </tr>
+    <tr>
+        <td>Ch1+</td>
+        <td>Checkerboard 1 presentation</td>
+    </tr>
+    <tr>
+        <td>Ch2+</td>
+        <td>Checkerboard 2 presentation</td>
+    </tr>
+    <tr>
+        <td>DIN3</td>
+        <td>StimTracker flag for visual stimuli</td>
+    </tr>
+    <tr>
+        <td>TRSP</td>
+        <td>End of stimulus presentation, contains additional stimulus information</td>
+    </tr>
+</table>
+
+
+
+#### Mismatch Negativity (MMN)
+
+<table>
+    <tr>
+        <th>Flag</th>
+        <th>Description</th>
+    </tr>
+    </tr>
+        <td>Bgn+</td>
+        <td>Start of task</td>
+    </tr>
+    </tr>
+        <td>Stms</td>
+        <td>MMN stimuli presentation</td>
+    </tr>
+    </tr>
+        <td>DIN2</td>
+        <td>StimTracker flag for auditory stimuli/td>
+    </tr>
+    <tr>
+        <td>TRSP</td>
+        <td>End of stimulus presentation, contains additional stimulus information (what sound was played)</td>
+    </tr>
+</table>
+
+
+
+#### Face Processing (FACE)
+
+<table>
+    <tr>
+        <th>Flag</th>
+        <th>Description</th>
+    </tr>
+    </tr>
+        <td>Bgn</td>
+        <td>Start of task</td>
+    </tr>
+    </tr>
+        <td>Stm+</td>
+        <td>FACE stimuli presentation</td>
+    </tr>
+    </tr>
+        <td>ITI+</td>
+        <td>Inter-trial time/td>
+    </tr>
+    <tr>
+        <td>fix+</td>
+        <td>Fixation cross presentation (between faces)</td>
+    </tr>
+    <tr>
+        <td>dist</td>
+        <td>Distractor/attention grabber</td>
+    </tr>
+    <tr>
+        <td>DIN3</td>
+        <td>StimTracker flag for visual stimuli</td>
+    </tr>
+    <tr>
+        <td>TRSP</td>
+        <td>End of stimulus presentation, contains additional stimulus information (what face was shown)</td>
+    </tr>
+</table>
+
+### EEG Acquisition Flags for V08
+
+
+
+#### Resting State
+
+<table>
+    <tr>
+        <th>Flag</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>Bgin</td>
+        <td>Start of task</td>
+    </tr>
+    <tr>
+        <td>bas+</td>
+        <td>Start of RS video</td>
+    </tr>
+    </tr>
+        <td>TRSP</td>
+        <td>End of stimulus presentation, contains additional stimulus information</td>
+    </tr>
+</table>
+
+
+
+#### Movie Clips (MC)
+
+<table>
+    <tr>
+        <th>Flag</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>Bgin</td>
+        <td>Start of task</td>
+    </tr>
+    <tr>
+        <td>soc+</td>
+        <td>Start of MC video</td>
+    </tr>
+    </tr>
+        <td>TRSP</td>
+        <td>End of stimulus presentation, contains additional stimulus information</td>
+    </tr>
+</table>
+
+
+
+#### Statistical Learning (SL)
+
+<table>
+    <tr>
+        <th>Flag</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>Bgin</td>
+        <td>Start of task</td>
+    </tr>
+    <tr>
+        <td>Stms</td>
+        <td>SL stimuli presentation</td>
+    </tr>
+    </tr>
+        <td>TRSP</td>
+        <td>End of stimulus presentation, contains additional stimulus information</td>
+    </tr>
+</table>
+
+
+
+#### Emotional Faces (EMO)
+
+<table>
+    <tr>
+        <th>Flag</th>
+        <th>Description</th>
+    </tr>
+    </tr>
+        <td>Bgn</td>
+        <td>Start of task</td>
+    </tr>
+    </tr>
+        <td>Stm+</td>
+        <td>EMO stimuli presentation</td>
+    </tr>
+    </tr>
+        <td>ITI+</td>
+        <td>Inter-trial time/td>
+    </tr>
+    <tr>
+        <td>fix+</td>
+        <td>Fixation cross presentation (between faces)</td>
+    </tr>
+    <tr>
+        <td>dist</td>
+        <td>Distractor/attention grabber</td>
+    </tr>
+    <tr>
+        <td>star</td>
+        <td>Star trial presentation</td>
+    </tr>
+    <tr>
+        <td>TRSP</td>
+        <td>End of stimulus presentation, contains additional stimulus information (what face was shown)</td>
+    </tr>
+</table>
+
+
 ## Unique Task Settings
 
 - ROI_of_interest: Selects the regions of interest for scoring of ERPs.
