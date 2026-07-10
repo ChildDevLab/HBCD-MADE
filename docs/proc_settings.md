@@ -56,7 +56,7 @@ These supported global settings are specified in the proc_settings_HBCD_containe
 
 ## EEG Acquisition Flag Descriptions
 
-### EEG Acquisition Flags for V03, V04, and V06
+### V03, V04, and V06
 
 
 #### Resting State (RS)
@@ -134,7 +134,7 @@ These supported global settings are specified in the proc_settings_HBCD_containe
     </tr>
     </tr>
         <td>DIN2</td>
-        <td>StimTracker flag for auditory stimuli/td>
+        <td>StimTracker flag for auditory stimuli</td>
     </tr>
     <tr>
         <td>TRSP</td>
@@ -161,7 +161,7 @@ These supported global settings are specified in the proc_settings_HBCD_containe
     </tr>
     </tr>
         <td>ITI+</td>
-        <td>Inter-trial time/td>
+        <td>Inter-trial time</td>
     </tr>
     <tr>
         <td>fix+</td>
@@ -181,11 +181,11 @@ These supported global settings are specified in the proc_settings_HBCD_containe
     </tr>
 </table>
 
-### EEG Acquisition Flags for V08
+### V08
 
 
 
-#### Resting State
+#### Resting State (RS)
 
 <table>
     <tr>
@@ -271,7 +271,7 @@ These supported global settings are specified in the proc_settings_HBCD_containe
     </tr>
     </tr>
         <td>ITI+</td>
-        <td>Inter-trial time/td>
+        <td>Inter-trial time</td>
     </tr>
     <tr>
         <td>fix+</td>
