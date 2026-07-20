@@ -16,43 +16,108 @@ For a list of processing specifications for HBCD EEG data, see HBCD Processing S
 
 These supported global settings are specified in the proc_settings_HBCD_container.json:
 
-- boundary_marker: (string) If this marker is present in the EEG file, data from before this marker will be removed prior to analysis.
-
-- ekg_channels: (string) Non-cortical electrode measuring the electrocardiogram.
-
-- channel_locations: (string) The path to the .sfp file with electrode channel locations. The sample_locs folder from EEGLAB is placed under /sample_locs in the container, so these files can be directly referenced from within the container (i.e., /sample_locs/GSN129.sfp). Alternatively, an external path can be provided to a custom file, but the path to this folder will then need to be bound to Singularity.
-
-- down_sample: (binary 1 or 0) Whether or not to downsample the data.
-
-- sampling_rate: (float) The new sampling rate you want following downsampling. This is only used if down_sample = 1.
-
-- delete_outerlayer: (binary 1 or 0) Whether the outer layer of channels should be deleted.
-
-- outerlayer_channel: (list of strings) Outer layer of channels to be deleted if delete_outerlayer = 1.
-
-- highpass: (float) The high-pass filter cutoff frequency.
-
-- lowpass: (float) The low-pass filter cutoff frequency.
-
-- remove_baseline: (binary 1 or 0) Whether to remove the baseline.
-
-- baseline_window: (list) Baseline time window.
-
-- voltthresh_rejection: (binary 1 or 0) Whether to remove epochs based on voltage rejection.
-
-- volt_threshold: (list of two floats) The negative and positive values in uV to use for epoch thresholding.
-
-- interp_epoch: (binary 1 or 0) Whether to interpolate over removed epochs.
-
-- frontal_channels: (list of strings) Frontal channels.
-
-- interp_channels: (binary 1 or 0) Whether to interpolate channels.
-
-- rerefer_data: (binary 1 or 0) Whether to re-reference the data.
-
-- reref: (list of strings) Either [] for the default re-referencing (average re-referencing) or provide the electrodes to use as reference.
-
-- output_format: (binary 1 or 2) 1 = .set; 2 = .mat
+<table>
+    <tr>
+        <th>Parameter</th>
+        <th>Parameter Data Type</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>boundary_marker</td>
+        <td>String</td>
+        <td>If this marker is present in the EEG file, data from before this marker will be removed prior to analysis.</td>
+    </tr>
+    <tr>
+        <td>ekg_channels</td>
+        <td>String</td>
+        <td>Non-cortical electrode measuring the electrocardiogram.</td>
+    </tr>
+    <tr>
+        <td>channel_locations</td>
+        <td>String</td>
+        <td>The path to the .sfp file with electrode channel locations. The sample_locs folder from EEGLAB is placed under /sample_locs in the container, so these files can be directly referenced from within the container (i.e., /sample_locs/GSN129.sfp). Alternatively, an external path can be provided to a custom file, but the path to this folder will then need to be bound to Singularity.</td>
+    </tr>
+    <tr>
+        <td>down_sample</td>
+        <td>Binary (1 or 0)</td>
+        <td>Whether or not to downsample the data.</td>
+    </tr>
+    <tr>
+        <td>sampling_rate</td>
+        <td>Float</td>
+        <td>The new sampling rate you want following downsampling. This is only used if down_sample = 1.</td>
+    </tr>
+    <tr>
+        <td>delete_outerlayer</td>
+        <td>Binary (1 or 0)</td>
+        <td>Whether the outer layer of channels should be deleted.</td>
+    </tr>
+    <tr>
+        <td>outerlayer_channel</td>
+        <td>List of strings</td>
+        <td>Outer layer of channels to be deleted if delete_outerlayer = 1.</td>
+    </tr>
+    <tr>
+        <td>highpass</td>
+        <td>Float</td>
+        <td>The high-pass filter cutoff frequency.</td>
+    </tr>
+    <tr>
+        <td>lowpass</td>
+        <td>Float</td>
+        <td>The low-pass filter cutoff frequency.</td>
+    </tr>
+    <tr>
+        <td>remove_baseline</td>
+        <td>Binary (1 or 0) </td>
+        <td>Whether to remove the baseline.</td>
+    </tr>
+    <tr>
+        <td>baseline_window</td>
+        <td>List</td>
+        <td>Baseline time window.</td>
+    </tr>
+    <tr>
+        <td>voltthresh_rejection</td>
+        <td>Binary (1 or 0) </td>
+        <td>Whether to remove epochs based on voltage rejection.</td>
+    </tr>
+    <tr>
+        <td>volt_threshold</td>
+        <td>List of two floats</td>
+        <td>The negative and positive values in uV to use for epoch thresholding.</td>
+    </tr>
+    <tr>
+        <td>interp_epoch</td>
+        <td>Binary (1 or 0) </td>
+        <td>Whether to interpolate over removed epochs.</td>
+    </tr>
+    <tr>
+        <td>frontal_channels</td>
+        <td>List of strings</td>
+        <td>Frontal channels.</td>
+    </tr>
+    <tr>
+        <td>interp_channels</td>
+        <td>Binary (1 or 0) </td>
+        <td>Whether to interpolate channels.
+    </tr>
+    <tr>
+        <td>rerefer_data</td>
+        <td>Binary (1 or 0) </td>
+        <td>Whether to re-reference the data.</td>
+    </tr>
+    <tr>
+        <td>reref</td>
+        <td>List of strings</td>
+        <td>Either [ ] for the default re-referencing (average re-referencing) or provide the electrodes to use as reference.</td>
+    </tr>
+    <tr>
+        <td>output_format</td>
+        <td>Binary (1 or 2) </td>
+        <td>1 = .set; 2 = .mat</td>
+    </tr>
+</table>
 
 ## EEG Acquisition Flag Descriptions
 
@@ -185,7 +250,7 @@ These supported global settings are specified in the proc_settings_HBCD_containe
 
 
 
-#### Resting State
+#### Resting State (RS)
 
 <table>
     <tr>
@@ -271,7 +336,7 @@ These supported global settings are specified in the proc_settings_HBCD_containe
     </tr>
     </tr>
         <td>ITI+</td>
-        <td>Inter-trial time/td>
+        <td>Inter-trial time</td>
     </tr>
     <tr>
         <td>fix+</td>
@@ -294,38 +359,77 @@ These supported global settings are specified in the proc_settings_HBCD_containe
 
 ## Unique Task Settings
 
-- ROI_of_interest: Selects the regions of interest for scoring of ERPs.
-
-- make_dummy_events: (true or false) Whether to insert dummy events into your scan. This option is used to create new events in the case of resting-state acquisitions where there are no triggers to denote epochs.
-
-- num_dummy_events: (int) The number of dummy events to make if make_dummy_events = true.
-
-- dummy_event_spacing: (float) The amount of time (in seconds) to have between dummy events. Note that epochs are constructed around events, so this isn’t the same as spacing between epochs.
-
-- pre_latency: (float) The amount of time (in seconds) to include in an epoch prior to the event specified by the entries in marker_names.
-
-- post_latency: (float) The amount of time (in seconds) to include in an epoch following the event specified by the entries in marker_names.
-
-- ERP_window_start: Time window of interest in the topographic plots and the averages for the .mat files.
-
-- ERP_window_end: Time window of interest in the topographic plots and the averages for the .mat files.
-
-- erp_filter: Boolean variable indicating whether to apply a second low-pass filter before creating ERPs.
-
-- erp_lowpass: Hz at which to apply the second low-pass filter.
-
-- marker_names: (list of strings) Name of event code markers you want to construct epochs around (e.g., DIN3). If make_dummy_events = true, then this should instead represent the first marker in your EEG file. Dummy events will then be placed after the first instance of this marker.
-
-- ERP_dirs: Direction of ERP components listed in "ERP_names". [-1] indicates a negaive-going component, and [1] indicates positive. These values are used to specify whether MADE should search for a positive or negative peak when computing peak latency and adaptive-mean amplitude for a given ERP. 
-
-- score_ages: List of age bins used to compute ERPS with age-dependent time windows. 
-
-- score_times{X}: Time ranges (in seconds) to use for plotting and scoring SME, ERP, and peak measures.
-
-- score_ROIs: Regions of interest to use for plotting and scoring SME, ERP, and peak measures.
-
-- ERP_names: Names of the scored ERP components
-
+<table>
+    <tr>
+        <th>Task Setting</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>ROI_of_interest</td>
+        <td>Selects the regions of interest for scoring of ERPs.</td>
+    </tr>
+    <tr>
+        <td>make_dummy_events</td>
+        <td>(true or false) Whether to insert dummy events into your scan. This option is used to create new events in the case of resting-state acquisitions where there are no triggers to denote epochs.</td>
+    </tr>
+    <tr>
+        <td>num_dummy_events</td>
+        <td>(int) The number of dummy events to make if make_dummy_events = true.</td>
+    </tr>
+    </tr>
+        <td>dummy_event_spacing</td>
+        <td>(float) The amount of time (in seconds) to have between dummy events. Note that epochs are constructed around events, so this isn’t the same as spacing between epochs.</td>
+    </tr>
+    <tr>
+        <td>pre_latency</td>
+        <td>(float) The amount of time (in seconds) to include in an epoch prior to the event specified by the entries in marker_names.
+        </td>
+    </tr>
+    </tr>
+        <td>post_latency</td>
+        <td>(float) The amount of time (in seconds) to include in an epoch following the event specified by the entries in marker_names.</td>
+    </tr>
+    </tr>
+        <td>ERP_window_start</td>
+        <td>Time window of interest in the topographic plots and the averages for the .mat files.</td>
+    </tr>
+    <tr>
+        <td>ERP_window_end</td>
+        <td>Time window of interest in the topographic plots and the averages for the .mat files.</td>
+    </tr>
+    </tr>
+        <td>erp_filter</td>
+        <td>Boolean variable indicating whether to apply a second low-pass filter before creating ERPs.</td>
+    </tr>
+    </tr>
+        <td>erp_lowpass</td>
+        <td>Hz at which to apply the second low-pass filter.</td>
+    </tr>
+    </tr>
+        <td>marker_names</td>
+        <td>(list of strings) Name of event code markers you want to construct epochs around (e.g., DIN3). If make_dummy_events = true, then this should instead represent the first marker in your EEG file. Dummy events will then be placed after the first instance of this marker.</td>
+    </tr>
+    </tr>
+        <td>ERP_dirs</td>
+        <td>Direction of ERP components listed in "ERP_names". [-1] indicates a negaive-going component, and [1] indicates positive. These values are used to specify whether MADE should search for a positive or negative peak when computing peak latency and adaptive-mean amplitude for a given ERP.</td>
+    </tr>
+    </tr>
+        <td>score_ages</td>
+        <td>List of age bins used to compute ERPS with age-dependent time windows.</td>
+    </tr>
+    </tr>
+        <td>score_times{X}</td>
+        <td>Time ranges (in seconds) to use for plotting and scoring SME, ERP, and peak measures.</td>
+    </tr>
+    </tr>
+        <td>score_ROIs</td>
+        <td>Regions of interest to use for plotting and scoring SME, ERP, and peak measures.</td>
+    </tr>
+    </tr>
+        <td>ERP_names</td>
+        <td>Names of the scored ERP components</td>
+    </tr>
+</table>
 
 !!! note
     DIN markers are inserted by a StimTracker and denote specific types of stimuli. DIN2 markers represent auditory stimuli from computer speakers, and DIN3 markers represent visual stimuli captured by a photocell on the participant monitor. DIN2 flags will always be present in MMN, and will appear in the FACE and VEP task only in cases when the researcher prompted “attention getter” stimuli which involve an auditory signal to bring the participant’s attention back to the computer screen. See [HBCD EEG Task Information](https://docs.hbcdstudy.org/latest/instruments/eeg/tasks/#hbcd-eeg-tasks) for more information.
