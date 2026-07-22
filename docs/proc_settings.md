@@ -25,7 +25,7 @@ These supported global settings are specified in the proc_settings_HBCD_containe
     <tr>
         <td>boundary_marker</td>
         <td>String</td>
-        <td>If this marker is present in the EEG file, data from before this marker will be removed prior to analysis.</td>
+        <td>If this marker is present in the EEG file, data from <br> before this marker will be removed prior to analysis.</td>
     </tr>
     <tr>
         <td>ekg_channels</td>
@@ -35,7 +35,7 @@ These supported global settings are specified in the proc_settings_HBCD_containe
     <tr>
         <td>channel_locations</td>
         <td>String</td>
-        <td>The path to the .sfp file with electrode channel locations. The sample_locs folder from EEGLAB is placed under /sample_locs in the container, so these files can be directly referenced from within the container (i.e., /sample_locs/GSN129.sfp). Alternatively, an external path can be provided to a custom file, but the path to this folder will then need to be bound to Singularity.</td>
+        <td>The path to the .sfp file with electrode channel locations. <br> The sample_locs folder from EEGLAB is placed under <br> /sample_locs in the container, so these files can be directly <br> referenced from within the container (i.e., /sample_locs/GSN129.sfp). <br> Alternatively, an external path can be provided to a custom file, <br> but the path to this folder will then need to be bound to Singularity.</td>
     </tr>
     <tr>
         <td>down_sample</td>
@@ -45,7 +45,7 @@ These supported global settings are specified in the proc_settings_HBCD_containe
     <tr>
         <td>sampling_rate</td>
         <td>Float</td>
-        <td>The new sampling rate you want following downsampling. This is only used if down_sample = 1.</td>
+        <td>The new sampling rate you want following downsampling. <br> This is only used if down_sample = 1.</td>
     </tr>
     <tr>
         <td>delete_outerlayer</td>
@@ -85,7 +85,7 @@ These supported global settings are specified in the proc_settings_HBCD_containe
     <tr>
         <td>volt_threshold</td>
         <td>List of two floats</td>
-        <td>The negative and positive values in uV to use for epoch thresholding.</td>
+        <td>The negative and positive values in uV to use for <br> epoch thresholding.</td>
     </tr>
     <tr>
         <td>interp_epoch</td>
@@ -110,7 +110,7 @@ These supported global settings are specified in the proc_settings_HBCD_containe
     <tr>
         <td>reref</td>
         <td>List of strings</td>
-        <td>Either [ ] for the default re-referencing (average re-referencing) or provide the electrodes to use as reference.</td>
+        <td>Either [ ] for the default re-referencing (average re-referencing) <br> or provide the electrodes to use as reference.</td>
     </tr>
     <tr>
         <td>output_format</td>
@@ -119,12 +119,10 @@ These supported global settings are specified in the proc_settings_HBCD_containe
     </tr>
 </table>
 
-## EEG Acquisition Flag Descriptions
-
-### EEG Acquisition Flags for V03, V04, and V06
+## EEG Acquisition Flags for V03, V04, and V06
 
 
-#### Resting State (RS)
+### Resting State (RS)
 
 <table>
     <tr>
@@ -151,7 +149,7 @@ These supported global settings are specified in the proc_settings_HBCD_containe
 
 
 
-#### Visual Evoked Potential (VEP)
+### Visual Evoked Potential (VEP)
 
 <table>
     <tr>
@@ -182,7 +180,7 @@ These supported global settings are specified in the proc_settings_HBCD_containe
 
 
 
-#### Mismatch Negativity (MMN)
+### Mismatch Negativity (MMN)
 
 <table>
     <tr>
@@ -199,17 +197,17 @@ These supported global settings are specified in the proc_settings_HBCD_containe
     </tr>
     </tr>
         <td>DIN2</td>
-        <td>StimTracker flag for auditory stimuli/td>
+        <td>StimTracker flag for auditory stimuli</td>
     </tr>
     <tr>
         <td>TRSP</td>
-        <td>End of stimulus presentation, contains additional stimulus information (what sound was played)</td>
+        <td>End of stimulus presentation, contains additional stimulus information <br> (what sound was played)</td>
     </tr>
 </table>
 
 
 
-#### Face Processing (FACE)
+### Face Processing (FACE)
 
 <table>
     <tr>
@@ -242,15 +240,15 @@ These supported global settings are specified in the proc_settings_HBCD_containe
     </tr>
     <tr>
         <td>TRSP</td>
-        <td>End of stimulus presentation, contains additional stimulus information (what face was shown)</td>
+        <td>End of stimulus presentation, contains additional stimulus information <br> (what face was shown)</td>
     </tr>
 </table>
 
-### EEG Acquisition Flags for V08
+## EEG Acquisition Flags for V08
 
 
 
-#### Resting State (RS)
+### Resting State (RS)
 
 <table>
     <tr>
@@ -273,7 +271,7 @@ These supported global settings are specified in the proc_settings_HBCD_containe
 
 
 
-#### Movie Clips (MC)
+### Movie Clips (MC)
 
 <table>
     <tr>
@@ -296,7 +294,7 @@ These supported global settings are specified in the proc_settings_HBCD_containe
 
 
 
-#### Statistical Learning (SL)
+### Statistical Learning (SL)
 
 <table>
     <tr>
@@ -319,7 +317,7 @@ These supported global settings are specified in the proc_settings_HBCD_containe
 
 
 
-#### Emotional Faces (EMO)
+### Emotional Faces (EMO)
 
 <table>
     <tr>
@@ -352,7 +350,7 @@ These supported global settings are specified in the proc_settings_HBCD_containe
     </tr>
     <tr>
         <td>TRSP</td>
-        <td>End of stimulus presentation, contains additional stimulus information (what face was shown)</td>
+        <td>End of stimulus presentation, contains additional stimulus information <br> (what face was shown)</td>
     </tr>
 </table>
 
@@ -370,7 +368,7 @@ These supported global settings are specified in the proc_settings_HBCD_containe
     </tr>
     <tr>
         <td>make_dummy_events</td>
-        <td>(true or false) Whether to insert dummy events into your scan. This option is used to create new events in the case of resting-state acquisitions where there are no triggers to denote epochs.</td>
+        <td>(true or false) Whether to insert dummy events into your scan. <br> This option is used to create new events in the case of resting-state <br> acquisitions where there are no triggers to denote epochs.</td>
     </tr>
     <tr>
         <td>num_dummy_events</td>
@@ -378,28 +376,28 @@ These supported global settings are specified in the proc_settings_HBCD_containe
     </tr>
     </tr>
         <td>dummy_event_spacing</td>
-        <td>(float) The amount of time (in seconds) to have between dummy events. Note that epochs are constructed around events, so this isn’t the same as spacing between epochs.</td>
+        <td>(float) The amount of time (in seconds) to have between dummy events. <br> Note that epochs are constructed around events, so this isn’t the same <br> as spacing between epochs.</td>
     </tr>
     <tr>
         <td>pre_latency</td>
-        <td>(float) The amount of time (in seconds) to include in an epoch prior to the event specified by the entries in marker_names.
+        <td>(float) The amount of time (in seconds) to include in an epoch prior to <br> the event specified by the entries in marker_names.
         </td>
     </tr>
     </tr>
         <td>post_latency</td>
-        <td>(float) The amount of time (in seconds) to include in an epoch following the event specified by the entries in marker_names.</td>
+        <td>(float) The amount of time (in seconds) to include in an epoch following the <br> event specified by the entries in marker_names.</td>
     </tr>
     </tr>
         <td>ERP_window_start</td>
-        <td>Time window of interest in the topographic plots and the averages for the .mat files.</td>
+        <td>Time window of interest in the topographic plots and the averages for <br> the .mat files.</td>
     </tr>
     <tr>
         <td>ERP_window_end</td>
-        <td>Time window of interest in the topographic plots and the averages for the .mat files.</td>
+        <td>Time window of interest in the topographic plots and the averages for <br> the .mat files.</td>
     </tr>
     </tr>
         <td>erp_filter</td>
-        <td>Boolean variable indicating whether to apply a second low-pass filter before creating ERPs.</td>
+        <td>Boolean variable indicating whether to apply a second low-pass filter before <br> creating ERPs.</td>
     </tr>
     </tr>
         <td>erp_lowpass</td>
@@ -407,11 +405,11 @@ These supported global settings are specified in the proc_settings_HBCD_containe
     </tr>
     </tr>
         <td>marker_names</td>
-        <td>(list of strings) Name of event code markers you want to construct epochs around (e.g., DIN3). If make_dummy_events = true, then this should instead represent the first marker in your EEG file. Dummy events will then be placed after the first instance of this marker.</td>
+        <td>(list of strings) Name of event code markers you want to construct epochs <br> around (e.g., DIN3). If make_dummy_events = true, then this should instead <br> represent the first marker in your EEG file. Dummy events will then be placed <br> after the first instance of this marker.</td>
     </tr>
     </tr>
         <td>ERP_dirs</td>
-        <td>Direction of ERP components listed in "ERP_names". [-1] indicates a negaive-going component, and [1] indicates positive. These values are used to specify whether MADE should search for a positive or negative peak when computing peak latency and adaptive-mean amplitude for a given ERP.</td>
+        <td>Direction of ERP components listed in "ERP_names". [-1] indicates a <br> negaive-going component, and [1] indicates positive. These values are used <br> to specify whether MADE should search for a positive or negative peak when <br> computing peak latency and adaptive-mean amplitude for a given ERP.</td>
     </tr>
     </tr>
         <td>score_ages</td>
@@ -419,11 +417,11 @@ These supported global settings are specified in the proc_settings_HBCD_containe
     </tr>
     </tr>
         <td>score_times{X}</td>
-        <td>Time ranges (in seconds) to use for plotting and scoring SME, ERP, and peak measures.</td>
+        <td>Time ranges (in seconds) to use for plotting and scoring SME, ERP, <br> and peak measures.</td>
     </tr>
     </tr>
         <td>score_ROIs</td>
-        <td>Regions of interest to use for plotting and scoring SME, ERP, and peak measures.</td>
+        <td>Regions of interest to use for plotting and scoring SME, ERP, <br> and peak measures.</td>
     </tr>
     </tr>
         <td>ERP_names</td>

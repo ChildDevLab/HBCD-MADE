@@ -55,7 +55,7 @@ Trial-level derivatives for the FACE task include mean amplitude.
 |---------------|------------------------------------------|
 | Condition | inverted, object, uprightInv, uprightObj |
 | TrialNum | trial index |
-| MeanAmplitude_*WindowStart-WindowEnd_ROI* | Mean amplitude within specified time window at specified ROI |
+| MeanAmplitude_*WindowStart-WindowEnd_ROI* | Mean amplitude within specified <br> time window at specified ROI |
 
 **2- FACE Summary Statistics Output**: `SUBSES_task-FACE-ERPSummaryStatistics.csv`
 
@@ -65,8 +65,8 @@ Subject-level derivatives for the FACE task include mean amplitude and SME.
 |---------------|------------------------------------------|
 | Condition | inverted, object, uprightInv, uprightObj |
 | NTrials | number of trials retained per condition |
-| MeanAmplitude_*WindowStart-WindowEnd_ROI* | Mean amplitude within specified time window at specified ROI |
-| SME_*WindowStart-WindowEnd_ROI* | Standard measurement error during specified time window at specified ROI |
+| MeanAmplitude_*WindowStart-WindowEnd_ROI* | Mean amplitude within specified <br> time window at specified ROI |
+| SME_*WindowStart-WindowEnd_ROI* | Standard measurement error during <br> specified time window at specified ROI |
 
 #### Mismatch Negativity/Auditory Oddball (MMN) task
 
@@ -90,7 +90,7 @@ Trial-level derivatives for the MMN task include mean amplitude.
 |---------------|------------------------------------------|
 | Condition | deviant, predeviant, standard |
 | TrialNum | trial index |
-| MeanAmplitude_*WindowStart-WindowEnd_ROI* | Mean amplitude within specified time window at specified ROI |
+| MeanAmplitude_*WindowStart-WindowEnd_ROI* | Mean amplitude within specified <br> time window at specified ROI |
 
 **2- MMN Summary Statistics Output**: `SUBSES_task-MMN-ERPSummaryStatistics.csv`
 
@@ -100,8 +100,8 @@ Subject-level derivatives for the MMN task include mean amplitude and SME.
 |---------------|------------------------------------------|
 | Condition | deviant, predeviant, standard |
 | NTrials | number of trials retained per condition |
-| MeanAmplitude_*WindowStart-WindowEnd_ROI* | Mean amplitude within specified time window at specified ROI |
-| SME_*WindowStart-WindowEnd_ROI* | Standard measurement error during specified time window at specified ROI |
+| MeanAmplitude_*WindowStart-WindowEnd_ROI* | Mean amplitude within specified <br> time window at specified ROI |
+| SME_*WindowStart-WindowEnd_ROI* | Standard measurement error during <br> specified time window at specified ROI |
 
 #### Visual Evoked Potential (VEP) Task
 
@@ -123,9 +123,9 @@ Trial-level derivatives for the VEP task include mean amplitude, adaptive mean (
 |---------------|------------------------------------------|
 | Condition | VEP |
 | TrialNum | trial index |
-| MeanAmplitude_*WindowStart-WindowEnd_ROI* | Mean amplitude within specified time window at specified ROI |
-| Peak_*WindowStart-WindowEnd_ROI* | Adaptive mean amplitude within specified time window at specified ROI |
-| Latency_*WindowStart-WindowEnd_ROI* | Latency to peak within specified time window at specified ROI |
+| MeanAmplitude_*WindowStart-WindowEnd_ROI* | Mean amplitude within specified <br> time window at specified ROI |
+| Peak_*WindowStart-WindowEnd_ROI* | Adaptive mean amplitude within <br> specified time window at specified ROI |
+| Latency_*WindowStart-WindowEnd_ROI* | Latency to peak within specified <br> time window at specified ROI |
 
 **2- VEP Summary Statistics Output**: `SUBSES_task-VEP-ERPSummaryStatistics.csv`
 
@@ -135,10 +135,10 @@ Subject-level derivatives for the VEP task include SME, mean amplitude, adaptive
 |---------------|------------------------------------------|
 | Condition | VEP |
 | NTrials | number of trials retained per condition |
-| SME_*WindowStart-WindowEnd_ROI* | Standard measurement error during specified time window at specified ROI |
-| MeanAmplitude_*WindowStart-WindowEnd_ROI* | Mean amplitude within specified time window at specified ROI |
-| Peak_*WindowStart-WindowEnd_ROI* | Adaptive mean amplitude within specified time window at specified ROI |
-| Latency_*WindowStart-WindowEnd_ROI* | Latency to peak within specified time window at specified ROI |
+| SME_*WindowStart-WindowEnd_ROI* | Standard measurement error during <br> specified time window at specified ROI |
+| MeanAmplitude_*WindowStart-WindowEnd_ROI* | Mean amplitude within specified <br> time window at specified ROI |
+| Peak_*WindowStart-WindowEnd_ROI* | Adaptive mean amplitude within <br> specified time window at specified ROI |
+| Latency_*WindowStart-WindowEnd_ROI* | Latency to peak within specified <br> time window at specified ROI |
 
 ### Resting State (RS) Power Derivatives
 
@@ -163,10 +163,10 @@ Subject-level absolute power values for RS.
 | Variable Name | Description                              |
 |---------------|------------------------------------------|
 | Row | Electrode | 
-| 1.0 Hz | Sum of absolute power in μV² centered at 1 Hz (within the 0.5hz to 1.5hz freq range) at corresponding electrode site |
-| 2.0 Hz | Sum of absolute power in μV² centered at 2 Hz (within the 1.5hz to 2.5hz freq range) at corresponding electrode site |
-| 3.0 Hz | Sum of absolute power in μV² centered at 3 Hz (within the 2.5hz to 3.5hz freq range) at corresponding electrode site |
-| 50.0 Hz | Sum of absolute power in μV² centered at 50 Hz (within the 49.5hz to 50.5hz freq range) at corresponding electrode site |
+| 1.0 Hz | Sum of absolute power in μV² centered at 1 Hz <br> (within the 0.5hz to 1.5hz freq range) at corresponding electrode site |
+| 2.0 Hz | Sum of absolute power in μV² centered at 2 Hz <br> (within the 1.5hz to 2.5hz freq range) at corresponding electrode site |
+| 3.0 Hz | Sum of absolute power in μV² centered at 3 Hz <br> (within the 2.5hz to 3.5hz freq range) at corresponding electrode site |
+| 50.0 Hz | Sum of absolute power in μV² centered at 50 Hz <br> (within the 49.5hz to 50.5hz freq range) at corresponding electrode site |
 
 **2- RS Power (dB) Spectra Output**: `SUBSES_task-RS-dbPowerSpectra.csv`
 
@@ -175,10 +175,10 @@ Subject-level dB power values for RS.
 | Variable Name | Description                              |
 |---------------|------------------------------------------|
 | Row | Electrode |
-| 1.0 Hz | Sum of power in dB centered at 1 Hz (within the 0.5hz to 1.5hz freq range) at corresponding electrode site |
-| 2.0 Hz | Sum of power in dB centered at 2 Hz (within the 1.5hz to 2.5hz freq range) at corresponding electrode site |
-| 3.0 Hz | Sum of power in dB centered at 3 Hz (within the 2.5hz to 3.5hz freq range) at corresponding electrode site |
-| 50.0 Hz | Sum of absolute power in μV² centered at 50 Hz (within the 49.5hz to 50.5hz freq range) at corresponding electrode site |
+| 1.0 Hz | Sum of power in dB centered at 1 Hz <br>  (within the 0.5hz to 1.5hz freq range) at corresponding electrode site |
+| 2.0 Hz | Sum of power in dB centered at 2 Hz <br>  (within the 1.5hz to 2.5hz freq range) at corresponding electrode site |
+| 3.0 Hz | Sum of power in dB centered at 3 Hz <br>  (within the 2.5hz to 3.5hz freq range) at corresponding electrode site |
+| 50.0 Hz | Sum of absolute power in μV² centered at 50 Hz <br>  (within the 49.5hz to 50.5hz freq range) at corresponding electrode site |
 
 **3- RS Log Power Spectra Output**: `SUBSES_task-RS-LogPowerSpectra.csv`
 
@@ -187,10 +187,10 @@ Subject-level log power values for RS.
 | Variable Name | Description                              |
 |---------------|------------------------------------------|
 | Electrode | Electrode label |
-| 1.0 Hz | Sum of natural log power centered at 1 Hz (within the 0.5hz to 1.5hz freq range) at corresponding electrode site |
-| 2.0 Hz | Sum of natural log power centered at 2 Hz (within the 1.5hz to 2.5hz freq range) at corresponding electrode site |
-| 3.0 Hz | Sum of natural log power centered at 3 Hz (within the 2.5hz to 3.5hz freq range) at corresponding electrode site |
-| 50.0 Hz | Sum of absolute power in μV² centered at 50 Hz (within the 49.5hz to 50.5hz freq range) at corresponding electrode site |
+| 1.0 Hz | Sum of natural log power centered at 1 Hz <br>  (within the 0.5hz to 1.5hz freq range) at corresponding electrode site |
+| 2.0 Hz | Sum of natural log power centered at 2 Hz <br>  (within the 1.5hz to 2.5hz freq range) at corresponding electrode site |
+| 3.0 Hz | Sum of natural log power centered at 3 Hz <br>  (within the 2.5hz to 3.5hz freq range) at corresponding electrode site |
+| 50.0 Hz | Sum of absolute power in μV² centered at 50 Hz <br>  (within the 49.5hz to 50.5hz freq range) at corresponding electrode site |
 
 **4- RS Power Spectra .mat Output**: `SUBSES_task-RS_spectra.mat`
 
