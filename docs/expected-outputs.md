@@ -120,22 +120,22 @@ The MADE preprocessing report is automatically generated for each session and co
 | datafile_name | file name of EEG data |
 | subject_id | unique subject identifier |
 | task | FACE, MMN, RS, VEP |
-| line_noise | estimate of how much electrical line noise is present in the EEG signal. Values of 1 indicate no line noise, values of 0 indicate pure line noise. |
-| reference_for_faster | reference electrode used by the FASTER algorithm used for bad channel detection (Nolan et al., 2010). |
-| faster_bad_channels | list of channels identified by FASTER algorithm as being artifactual, or not representative of brain activity. |
+| line_noise | estimate of how much electrical line noise is present in the EEG signal. <br> Values of 1 indicate no line noise, values of 0 indicate pure line noise. |
+| reference_for_faster | reference electrode used by the FASTER algorithm used <br> for bad channel detection (Nolan et al., 2010). |
+| faster_bad_channels | list of channels identified by FASTER algorithm as <br> being artifactual, or not representative of brain activity. |
 | ica_prep_bad_channels | channels deleted by FASTER before ICA. |
-| length_ica_data | how much continuous data (in seconds) was used for independent component analysis. |
+| length_ica_data | how much continuous data (in seconds) was <br> used for independent component analysis. |
 | total_ICs | number of independent components identified. |
-| ICs_removed | independent components removed by adjusted-ADJUST (Leach et al, 2020). |
+| ICs_removed | independent components removed <br> by adjusted-ADJUST (Leach et al, 2020). |
 | total_epochs_pre_artifact_rej | number of epochs collected. |
 | total_epochs_post_artifact_rej | number of epochs retained after epoch-level artifact rejection. |
-| total_channels_interp | number of channels interpolated using spline interpolation after bad channel removal. |
-| avg_chan_interp_artifact_rej | average number of channels interpolated per epoch using spline interpolation for each task. |
-| std_chan_interp_artifact_rej | standard deviation of the number of channels removed per epoch for each task. |
+| total_channels_interp | number of channels interpolated using spline interpolation <br> after bad channel removal. |
+| avg_chan_interp_artifact_rej | average number of channels interpolated per epoch using <br> spline interpolation for each task. |
+| std_chan_interp_artifact_rej | standard deviation of the number of channels removed <br> per epoch for each task. |
 | range_chan_interp_artifact_rej | range of number of channels interpolated per epoch. |
-| StimTracker_Deviation | denotes whether StimTracker was used correctly during task (ON for V03, V04, V06 ERP tasks and OFF for V08 ERP tasks). 1 indicates correct use of StimTracker, 0 indicates incorrect use. |
+| StimTracker_Deviation | denotes whether StimTracker was used correctly during task <br> (ON for V03, V04, V06 ERP tasks and OFF for V08 ERP tasks). <br> 1 indicates correct use of StimTracker, 0 indicates incorrect use. |
 | Stimtracker_Artifact_present | was StimTracker arftifact identified in the task? 0 = no, 1 = yes |
-| Stimtracker_Artifact_fixed | was linear interpolation applied to this task? 0 = no, 1 = yes  |
+| Stimtracker_Artifact_fixed | was StimTracker arftifact corrected with linear interpolation? 0 = no, 1 = yes  |
 | Uniform_detected | was signal uniformity identified? |
 | Uniform_time | length of signal uniformity (in seconds) |
 
