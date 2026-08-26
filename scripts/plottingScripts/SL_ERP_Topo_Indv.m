@@ -54,6 +54,7 @@ cd(save_path)
 %% CONFIG
 n_iterations = 10;   % surrogate iterations for ZITC
 rng_seed     = 0;    % random seed for reproducible surrogate shuffling
+set(0, 'DefaultFigureVisible', 'off'); % only save figures
 
 %% COMPUTE RAW AND Z-SCORED ITC
 [raw_plv, freqs] = compute_itc(EEG);

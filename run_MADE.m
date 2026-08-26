@@ -1616,17 +1616,32 @@ for run = 1 : length(event_struct.file_names)
         % on cbrain, look for scans.tsv
         tsvpath= [bids_dir filesep participant_label filesep session_label];
         agetable = readtable([tsvpath filesep participant_label '_' session_label '_scans.tsv'],"Filetype","text",'Delimiter','\t');
+
         try
-            taskages=agetable.age(contains(agetable.filename,'acq-eeg'));
-            try
-                age = taskages(1)*12; 
-            catch
+            taskages = agetable.age(contains(agetable.filename, 'acq-eeg'));
+
+            if isempty(taskages)
                 error("Age is n/a?")
             end
+
+            if iscell(taskages)
+                age = str2double(taskages{1}) * 12;
+            else
+                age = taskages(1) * 12;
+            end
+
         catch
             error("1. Age data is missing in scans.tsv!")
         end
-    
+        %try
+        %taskages=agetable.age(contains(agetable.filename,'acq-eeg'));
+        %try
+        %age = taskages(1)*12;
+        %catch
+        %error("Age is n/a?")
+        %end
+        %catch
+        %error("1. Age data is missing in scans.tsv!")
     catch
         % locally, use participants.tsv
         agetable = readtable([bids_dir filesep 'participants.tsv'],"Filetype","text",'Delimiter','\t');
@@ -1664,6 +1679,16 @@ for run = 1 : length(event_struct.file_names)
         try
             computeSME(EEG, event_struct.file_names{run}, json_settings_file, 'FACE', output_location, participant_label, session_label, age)
             FACE_ERP_Topo_Indv();
+            clear allData;
+        catch
+            continue
+        end
+    elseif contains(event_struct.file_names{run}, 'EMO')
+        try
+            computeSME(EEG, event_struct.file_names{run}, json_settings_file, 'EMO', output_location, participant_label, session_label, age)
+
+            EMO_ERP_Topo_Indv();
+            
             clear allData;
         catch
             continue

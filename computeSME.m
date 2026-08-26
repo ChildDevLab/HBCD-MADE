@@ -15,12 +15,20 @@ settingsData = jsondecode(jsonStr);
 
 % TM - new check for session label for choosing ERPs
 if strcmp(session_label, 'ses-V03')
-    %choose ses-v03 settings
+
+    % choose ses-V03 settings
     s1 = s.ses_V03;
 
-else
-    %choose ses-v04 settings
+elseif strcmp(session_label, 'ses-V04')
+
+    % choose ses-V04 settings
     s1 = s.ses_V04;
+
+elseif strcmp(session_label, 'ses-V08')
+
+    % choose ses-V08 settings
+    s1 = s.ses_V08;
+
 end
 
 %Grab task specific settings
@@ -173,7 +181,7 @@ for i=1:length(scoreTimes)
                 tab2.("TrialNum") = EEG_i_trialnums;
             end
         end
-
+        
         if sum(contains(conditions, '3'))==1
             EEG_o = pop_selectevent(EEG, 'Condition', '3', 'deleteevents','on'); %select only object trials
             EEG_o = eeg_checkset(EEG_o);
@@ -252,7 +260,167 @@ for i=1:length(scoreTimes)
 
         tabFull = [tab; tab2; tab3; tab4;];
         tabFull.ID(:) = convertCharsToStrings(participant_label);
+    elseif strcmp(task, 'EMO')
+        tab=[];
+        tab2=[];
+        tab3=[];
+        tab4=[];
+        conditions = unique({EEG.event.Condition}); %check which conditions exist
+        if sum(contains(conditions, 'stm_calm'))==1
+            EEG_c = pop_selectevent(EEG, 'Condition', 'stm_calm', 'deleteevents','on'); %select only uprightInv trials
+            EEG_c = eeg_checkset(EEG_c);
+            if EEG_c.trials == 1 %exception for when there is only one trial retained for this condition
+                EEG_c_trialnums = {EEG_c.event.TrialNum}';
+                EEG_c_roi = squeeze(mean(EEG_c.data(roi_ind, :,:),1)); %select and average across channels of interest
+                EEG_c_peak = squeeze(mean(EEG_c_roi(PeakRange))); %select and average across timerange of interest
+                Scores = EEG_c_peak';
 
+                tab = array2table(Scores); %make table
+                tab = renamevars(tab,["Scores"], ['MeanAmplitude_' char(erp_name) '_' char(Cluster)]); %label table
+
+
+                % % Insert peak latency function here
+                % [AvgPeakScores, PeakLatencies] =  compute_peaks_latencies(EEG_c, PeakRange, roi_ind, direction);%NEW TM
+                % tab.(['AdaptiveMean_' char(erp_name) '_' char(Cluster)]) = AvgPeakScores;
+                % tab.(['Latency_' char(erp_name) '_' char(Cluster)]) = PeakLatencies;
+
+                tab.Condition(:) = "calm"; %add condition variable
+                tab.("TrialNum") = EEG_c_trialnums; %add trial num variable
+            else
+                EEG_c_trialnums = {EEG_c.event.TrialNum}';
+                EEG_c_roi = squeeze(mean(EEG_c.data(roi_ind, :,:),1)); %select and average across channels of interest
+                EEG_c_peak = squeeze(mean(EEG_c_roi(PeakRange, :),1)); %select and average across timerange of interest
+                Scores = EEG_c_peak';
+                tab = array2table(Scores); %make table
+                tab = renamevars(tab,["Scores"], ['MeanAmplitude_' char(erp_name) '_' char(Cluster)]); %label table
+
+                % % Insert peak latency function here
+                % [AvgPeakScores, PeakLatencies] =  compute_peaks_latencies(EEG_c, PeakRange, roi_ind, direction);%NEW TM
+                % tab.(['AdaptiveMean_' char(erp_name) '_' char(Cluster)]) = AvgPeakScores;
+                % tab.(['Latency_' char(erp_name) '_' char(Cluster)]) = PeakLatencies;
+
+                tab.Condition(:) = "calm"; %add condition variable
+                tab.("TrialNum") = EEG_c_trialnums; %add trial num variable
+            end
+        end
+
+        if sum(contains(conditions, 'stm_anger'))==1
+            EEG_a = pop_selectevent(EEG, 'Condition', 'stm_anger', 'deleteevents','on'); %select only inverted trials
+            EEG_a = eeg_checkset(EEG_a);
+            if EEG_a.trials == 1
+                EEG_a_trialnums = {EEG_a.event.TrialNum}';
+                EEG_a_roi = squeeze(mean(EEG_a.data(roi_ind, :,:),1)); %select and average across channels of interest
+                EEG_a_peak = squeeze(mean(EEG_a_roi(PeakRange))); %select and average across timerange of interest
+                Scores = EEG_a_peak';
+                tab2 = array2table(Scores); %make table
+                tab2 = renamevars(tab2,["Scores"], ['MeanAmplitude_' char(erp_name) '_' char(Cluster)]); %label table
+
+                % % Insert peak latency function here
+                % [AvgPeakScores, PeakLatencies] =  compute_peaks_latencies(EEG_a, PeakRange, roi_ind, direction);%NEW TM
+                % tab2.(['AdaptiveMean_' char(erp_name) '_' char(Cluster)]) = AvgPeakScores;
+                % tab2.(['Latency_' char(erp_name) '_' char(Cluster)]) = PeakLatencies;
+
+
+                tab2.Condition(:) = "anger"; %add condition variable
+                tab2.("TrialNum") = EEG_a_trialnums; %add trial num variable
+            else
+                EEG_a_trialnums = {EEG_a.event.TrialNum}';
+                EEG_a_roi = squeeze(mean(EEG_a.data(roi_ind, :,:),1)); %select and average across channels of interest
+                EEG_a_peak = squeeze(mean(EEG_a_roi(PeakRange, :),1)); %select and average across timerange of interest
+                Scores = EEG_a_peak';
+                tab2 = array2table(Scores); %make table
+                tab2 = renamevars(tab2,["Scores"], ['MeanAmplitude_' char(erp_name) '_' char(Cluster)]); %label table
+
+                % % Insert peak latency function here
+                % [AvgPeakScores, PeakLatencies] =  compute_peaks_latencies(EEG_a, PeakRange, roi_ind, direction);%NEW TM
+                % tab2.(['AdaptiveMean_' char(erp_name) '_' char(Cluster)]) = AvgPeakScores;
+                % tab2.(['Latency_' char(erp_name) '_' char(Cluster)]) = PeakLatencies;
+
+
+                tab2.Condition(:) = "anger"; %add condition variable
+                tab2.("TrialNum") = EEG_a_trialnums;
+            end
+        end
+
+        if sum(contains(conditions, 'stm_happy'))==1
+            EEG_h = pop_selectevent(EEG, 'Condition', 'stm_happy', 'deleteevents','on'); %select only object trials
+            EEG_h = eeg_checkset(EEG_h);
+            if EEG_h.trials == 1
+                EEG_h_trialnums = {EEG_h.event.TrialNum}';
+                EEG_h_roi = squeeze(mean(EEG_h.data(roi_ind, :,:),1)); %select and average across channels of interest
+                EEG_h_peak = squeeze(mean(EEG_h_roi(PeakRange))); %select and average across timerange of interest
+                Scores = EEG_h_peak';
+                tab3 = array2table(Scores); %make table
+                tab3 = renamevars(tab3,["Scores"], ['MeanAmplitude_' char(erp_name) '_' char(Cluster)]); %label table
+
+                % % TODO: Insert peak latency function here
+                % [AvgPeakScores, PeakLatencies] =  compute_peaks_latencies(EEG_h, PeakRange, roi_ind, direction);%NEW TM
+                % tab3.(['AdaptiveMean_' char(erp_name) '_' char(Cluster)]) = AvgPeakScores;
+                % tab3.(['Latency_' char(erp_name) '_' char(Cluster)]) = PeakLatencies;
+
+
+                tab3.Condition(:) = "happy"; %add condition variable
+                tab3.("TrialNum") = EEG_h_trialnums; %add trial num variable
+            else
+                EEG_h_trialnums = {EEG_h.event.TrialNum}';
+                EEG_h_roi = squeeze(mean(EEG_h.data(roi_ind, :,:),1)); %select and average across channels of interest
+                EEG_h_peak = squeeze(mean(EEG_h_roi(PeakRange, :),1)); %select and average across timerange of interest
+                Scores = EEG_h_peak';
+                tab3 = array2table(Scores); %make table
+                tab3 = renamevars(tab3,["Scores"], ['MeanAmplitude_' char(erp_name) '_' char(Cluster)]); %label table
+
+                % % Insert peak latency function here
+                % [AvgPeakScores, PeakLatencies] =  compute_peaks_latencies(EEG_h, PeakRange, roi_ind, direction);%NEW TM
+                % tab3.(['AdaptiveMean_' char(erp_name) '_' char(Cluster)]) = AvgPeakScores;
+                % tab3.(['Latency_' char(erp_name) '_' char(Cluster)]) = PeakLatencies;
+
+
+                tab3.Condition(:) = "happy"; %add condition variable
+                tab3.("TrialNum") = EEG_h_trialnums;
+            end
+        end
+
+        if sum(contains(conditions, 'stm_fearful'))==1
+            EEG_f = pop_selectevent(EEG, 'Condition', 'stm_fearful', 'deleteevents','on'); %select only uprightObj trials
+            EEG_f = eeg_checkset(EEG_f);
+            if EEG_f.trials == 1
+                EEG_f_trialnums = {EEG_f.event.TrialNum}';
+                EEG_f_roi = squeeze(mean(EEG_f.data(roi_ind, :,:),1)); %select and average across channels of interest
+                EEG_f_peak = squeeze(mean(EEG_f_roi(PeakRange))); %select and average across timerange of interest
+                Scores = EEG_f_peak';
+                tab4 = array2table(Scores); %make table
+                tab4 = renamevars(tab4,["Scores"], ['MeanAmplitude_' char(erp_name) '_' char(Cluster)]); %label table
+
+                % %Insert peak latency function here
+                % [AvgPeakScores, PeakLatencies] =  compute_peaks_latencies(EEG_f, PeakRange, roi_ind, direction);%NEW TM
+                % tab4.(['AdaptiveMean_' char(erp_name) '_' char(Cluster)]) = AvgPeakScores;
+                % tab4.(['Latency_' char(erp_name) '_' char(Cluster)]) = PeakLatencies;
+
+
+                tab4.Condition(:) = "fearful"; %add condition variable
+                tab4.("TrialNum") = EEG_f_trialnums; %add trial num variable
+            else
+                EEG_f_trialnums = {EEG_f.event.TrialNum}';
+                EEG_f_roi = squeeze(mean(EEG_f.data(roi_ind, :,:),1)); %select and average across channels of interest
+                EEG_f_peak = squeeze(mean(EEG_f_roi(PeakRange, :),1)); %select and average across timerange of interest
+                Scores = EEG_f_peak';
+                tab4 = array2table(Scores); %make table
+                tab4 = renamevars(tab4,["Scores"], ['MeanAmplitude_' char(erp_name) '_' char(Cluster)]); %label table
+
+                % % Insert peak latency function here
+                % [AvgPeakScores, PeakLatencies] =  compute_peaks_latencies(EEG_f, PeakRange, roi_ind, direction);%NEW TM
+                % tab4.(['AdaptiveMean_' char(erp_name) '_' char(Cluster)]) = AvgPeakScores;
+                % tab4.(['Latency_' char(erp_name) '_' char(Cluster)]) = PeakLatencies;
+
+
+                tab4.Condition(:) = "fearful"; %add condition variable
+                tab4.("TrialNum") = EEG_f_trialnums;
+            end
+        end
+
+        tabFull = [tab; tab2; tab3; tab4;];
+        tabFull.ID(:) = convertCharsToStrings(participant_label);
+    
     elseif strcmp(task, 'MMN')
         tab=[];
         tab2=[];

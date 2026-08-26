@@ -73,8 +73,8 @@
       "E127",
       "E128"
     ],
-    "channel_locations": "/sample_locs/0_2AverageNet128_v1.sfp",
-    "site_delay_file": "./mean_flag_delay_by_site.csv",
+    "channel_locations": "C:/Users/avallora/Box/hbcd/HBCD-MADE/0_2AverageNet128_v1.sfp",
+    "site_delay_file": "C:/Users/avallora/Box/hbcd/HBCD-MADE/mean_flag_delay_by_site.csv",
     "down_sample": 0,
     "sampling_rate": 1000,
     "delete_outerlayer": 1,
@@ -279,6 +279,13 @@
     "erp_lowpass": 30,
     "marker_names": [
       "stm+"
-    ]
-  }
+    ],
+    "ses-V08": {
+        "ERP_dirs": [-1, -1, -1, 1, 1, 1, -1],
+        "score_ages": [],
+        "score_times": [[200, 350], [200, 350], [200, 350], [350, 600], [350, 600], [350, 600], [300, 600]],
+        "score_ROIs": ["p8", "p7", "oz", "p8", "p7", "oz", "fcz"],
+        "ERP_names": ["N290", "N290", "N290", "P400", "P400", "P400", "NC"]
+    }
+}
 }
