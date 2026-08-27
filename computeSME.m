@@ -24,10 +24,13 @@ elseif strcmp(session_label, 'ses-V04')
     % choose ses-V04 settings
     s1 = s.ses_V04;
 
-elseif strcmp(session_label, 'ses-V08')
+elseif ismember(session_label, {'ses-V08', 'ses-P08'})
 
-    % choose ses-V08 settings
     s1 = s.ses_V08;
+
+elseif ismember(session_label, {'ses-V10', 'ses-P10'})
+
+    s1 = s.ses_V10;
 
 end
 
