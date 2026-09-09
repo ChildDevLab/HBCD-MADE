@@ -165,14 +165,40 @@ for run=1:length(datafile_names)
 
     % TM - 4/1/25 Read in Site Delays file earlier as a relative path (You
     % must be in the correct Working Directory or this will error)
-    site_delay_file = s.site_delay_file;
-    cd(currentWD); %change this to wherever it is saved
+    % AV - 9/2/26 adding logic for using different site_delay files
+
+    visit_num = str2double(regexp(session_label, '\d+', 'match', 'once'));
+    
+    drift = [];
+    
+    if visit_num >= 8
+        site_delay_file = s.site_delay_file_2;
+    else
+        site_delay_file = s.site_delay_file;
+    end
+
+    cd(currentWD); % change this to wherever it is saved
+
     try
         site_delays = readtable(site_delay_file);
     catch
         disp(currentWD);
         error("No Site delay file present, please check working directory");
     end
+
+    % AV - 9/2/26 match amp for site delay
+    if visit_num >= 8
+    amp_serial = EEG.mffInfo.ampSerialNumber;
+    amp_idx = strcmp(string(site_delays.amp), string(amp_serial));
+
+    if ~any(amp_idx)
+        error("Amp serial number %s not found in site delay file", string(amp_serial));
+    end
+
+    if contains(EEG.filename, 'SL')
+        drift = site_delays.median_SL_drift(amp_idx);
+    end
+end
 
     % 5. Do you want to down sample the data?
     down_sample = s.down_sample; % 0 = NO (no down sampling), 1 = YES (down sampling)
@@ -367,8 +393,10 @@ for run=1:length(datafile_names)
     % remove discontinous data at the start of the file
     disconMarkers = find(strcmp({EEG.event.type}, boundary_marker)); % boundary markers often indicate discontinuity
     if isempty(disconMarkers) == false
+       
         EEG = eeg_eegrej( EEG, [1 EEG.event(disconMarkers(1)).latency] ); % remove discontinuous chunk... if not EGI, MODIFY BEFORE USING THIS SECTION
         EEG = eeg_checkset( EEG );
+
     end
 
     
@@ -448,9 +476,6 @@ for run=1:length(datafile_names)
             error("Site data is missing locally!")
         end
     end
-    %end
-
-    %add code to use amp or site info to get row index from V08 csv
 
     % adjust delay based on task
     if contains(session_label, 'V08') || contains(session_label, 'P08')
@@ -507,8 +532,7 @@ for run=1:length(datafile_names)
             end
 
             din3s = find(strcmp({EEG.event.type}, 'DIN3'));
-            %sitedelay = site_delays(index, 'mean_EMO_delay').mean_EMO_delay;
-            sitedelay = 1; %TM testing
+            sitedelay = site_delays.median_EMO_delay(amp_idx);
 
             stmlist = find(strcmp({EEG.event.type}, 'stm+'));
 
@@ -526,41 +550,12 @@ for run=1:length(datafile_names)
                 stimdev(run) = 1; % mark that there is a deviation
             end
 
-        elseif contains(EEG.filename, 'RS')
-            din3s = find(strcmp({EEG.event.type}, 'DIN3'));
-
-            %sitedelay = site_delays(index, 'mean_RS_delay').mean_RS_delay;
-            sitedelay = 1; %TM testing
-
-            trsplist = find(contains({EEG.event.mffkey_movi}, 'V08construction'));
-            stmlist = find(strcmp({EEG.event.type}, 'bas+'));
-
-            %check for right task
-            if isempty(trsplist)
-                error("are you sure this is RS?")
-            end
-
-            %check if the stimlist is more than one and error
-            if length(stmlist) > 1
-                error("more than one bas+ flag, check raw data please")
-            elseif isempty(stmlist)
-                error("no bas+ flag found, check raw data please")
-            end
-
-            latency = EEG.event(stmlist).old_latency;
-            EEG.event(stmlist).latency = latency + sitedelay;
-            EEG = eeg_checkset(EEG, 'eventconsistency');
-
-            if ~isempty(din3s)
-                %THERE ARE DINS THAT'S A PROBLEM
-                stimdev(run) = 1;
-            end
-
         elseif contains(EEG.filename, 'SL')
-            din2s = find(strcmp({EEG.event.type}, 'DIN2'));
 
-            %sitedelay = site_delays(index, 'mean_SL_delay').mean_SL_delay;
-            sitedelay = 1; %TM testing
+            din2s = find(strcmp({EEG.event.type}, 'DIN2'));
+            
+            sitedelay = site_delays.median_SL_delay(amp_idx);
+            %drift = site_delays.median_SL_drift(amp_idx);
 
             trsplist = find(contains({EEG.event.mffkey_swav}, 'SL'));
             stmlist = find(strcmp({EEG.event.type}, 'stms'));
@@ -579,6 +574,7 @@ for run=1:length(datafile_names)
 
             latency = EEG.event(stmlist).old_latency;
             EEG.event(stmlist).latency = latency + sitedelay;
+            
             EEG = eeg_checkset(EEG, 'eventconsistency');
 
             if ~isempty(din2s)
@@ -589,8 +585,8 @@ for run=1:length(datafile_names)
         elseif contains(EEG.filename, 'MC')
 
             din3s = find(strcmp({EEG.event.type}, 'DIN3'));
-            %sitedelay = site_delays(index, 'mean_MC_delay').mean_MC_delay;
-            sitedelay = 1; %TM testing
+            sitedelay = site_delays.median_MC_delay(amp_idx);
+            %sitedelay = 1; %TM testing
 
             trsplist = find(contains({EEG.event.mffkey_movi}, 'V08MC'));
             stmlist = find(strcmp({EEG.event.type}, 'soc+'));
@@ -811,7 +807,7 @@ for run=1:length(datafile_names)
 
     try
 
-        if ~any(contains(session_label, {'V08','P08'})) && ...
+        if ~any(contains(session_label, {'V08','P08', 'V10', 'P10'})) && ...
                 any(strcmp(task_label, {'task-MMN','task-FACE','task-VEP'}))
 
             [EEG, artifact_detected, stimtracker_interp_applied] = ...
@@ -849,26 +845,63 @@ for run=1:length(datafile_names)
     % Please note we are tracking but not removing line noise. In
     % discussion with Nathan Fox and Santiago Morales, it is agreed this
     % should not be changed at this time - 5/6/2026 AV
+    try
         lineNoiseIn = struct('lineNoiseMethod', 'clean', ...
             'lineNoiseChannels', 1:EEG.nbchan, 'Fs', EEG.srate, ...
             'lineFrequencies', [60 120], 'p', 0.01, 'fScanBandWidth', 2, ...
             'taperBandWidth', 2, 'taperWindowSize', 4, 'taperWindowStep', 4, ...
             'tau', 100, 'pad', 2, 'fPassBand', [0 EEG.srate/2], ...
             'maximumIterations', 10);
-        
+
         [outEEG, ~]  = cleanLineNoise(EEG, lineNoiseIn);
-        
+
         neighbors = [59,60,61];
         lnParams_harms_frequs = [];
         lnMeans = [];
-        
+
         % LINE NOISE REDUCTION QM: Assesses the performance of line noise reduction.
-        
+
         lnMeans = assessPipelineStep('line noise reduction', reshape(EEG.data, ...
             size(EEG.data, 1), []), reshape(outEEG.data, size(outEEG.data,1), ...
             []), lnMeans, EEG.srate, [neighbors lnParams_harms_frequs]) ;
-        
+
         lineNoise{end+1} = lnMeans(3); %grab only the 60 hz pre/post r value
+
+    catch ME
+
+    fprintf('\nWARNING: Line noise measure failed.\n');
+    fprintf('File: %s\n', EEG.filename);
+    fprintf('Error: %s\n', ME.message);
+
+    % =========================
+    % LOG + SAVE + SKIP
+    % =========================
+    fprintf('Skipping file (CleanLine issue): %s\n', EEG.filename);
+    unusable_files{end+1,1} = datafile_names{run};
+
+    % --- Save flagged file ---
+    if output_format == 1
+        EEG = eeg_checkset(EEG);
+        EEG = pop_editset(EEG, 'setname', ...
+            strrep(datafile_names{run}, ext, '_desc-cleanlineissue_eeg'));
+        EEG = pop_saveset(EEG, ...
+            'filename', strrep(datafile_names{run}, ext, '_desc-cleanlineissue_eeg.set'), ...
+            'filepath', [output_location filesep 'processed_data' filesep]);
+
+    elseif output_format == 2
+        save([[output_location filesep 'processed_data' filesep] ...
+            strrep(datafile_names{run}, ext, '_desc-cleanlineissue_eeg.mat')], 'EEG');
+    end
+
+    % Remove failed file from tracking vectors
+    stimdev = stimdev(1:end-1);
+    artifact_detected_all = artifact_detected_all(1:end-1);
+    stimtracker_interp_applied_all = stimtracker_interp_applied_all(1:end-1);
+    uniform_detected = uniform_detected(1:end-1);
+    uniform_time = uniform_time(1:end-1);
+
+    continue
+end
     
     %% STEP 6: Filter data
     % Calculate filter order using the formula: m = dF / (df / fs), where m = filter order,
@@ -1376,7 +1409,7 @@ for run = 1 : length(event_struct.file_names)
     Tasks(run) = string(task);
     
     %site information pulled in step 3 - TM
-    EEG = make_MADE_epochs(EEG, event_struct.file_names{run}, json_settings_file, task, siteinfo, site_delays, session_label);
+    EEG = make_MADE_epochs(EEG, event_struct.file_names{run}, json_settings_file, task, siteinfo, site_delays, session_label, drift);
     total_epochs_before_artifact_rejection(run)=EEG.trials;
     
     %% STEP 13: Remove baseline
@@ -1659,7 +1692,7 @@ for run = 1 : length(event_struct.file_names)
             computeSME(EEG, event_struct.file_names{run}, json_settings_file, 'MMN', output_location, participant_label, session_label, age)
             MMN_ERP_Topo_Indv();
             clear allData;
-        catch
+        catch 
             continue
         end
     
@@ -1690,12 +1723,12 @@ for run = 1 : length(event_struct.file_names)
             continue
         end
     elseif contains(event_struct.file_names{run}, 'SL') 
-        try
-            SL_ERP_Topo_Indv();
-            clear allData;
-        catch
-            continue
-        end
+    try
+        SL_ERP_Topo_Indv();
+        clear allData;
+    catch 
+        continue
+    end
 
     elseif any(contains(event_struct.file_names{run}, {'RS','MC'})) % We are currently treating MC like RS and might add additional analyses for dr.4.0 - AV 5/11/2026
         try
@@ -1714,6 +1747,50 @@ end % end of run loop
 %% Create the report table for all the data files with relevant preprocessing outputs.
 %if datafile names is empty and there are no tasks with data, that is
 %handled earlier and will not make it to this point
+
+%DEBUG
+fprintf('\n--- REPORT VECTOR LENGTHS ---\n');
+
+vars = {
+    'datafile_names', datafile_names;
+    'sub_id', sub_id;
+    'Tasks', Tasks;
+    'lineNoise', lineNoise;
+    'reference_used_for_faster', reference_used_for_faster;
+    'faster_bad_channels', faster_bad_channels;
+    'ica_preparation_bad_channels', ica_preparation_bad_channels;
+    'length_ica_data', length_ica_data;
+    'total_ICs', total_ICs;
+    'ICs_removed', ICs_removed;
+    'total_epochs_before_artifact_rejection', total_epochs_before_artifact_rejection;
+    'total_epochs_after_artifact_rejection', total_epochs_after_artifact_rejection;
+    'FACE_UpInv', FACE_UpInv;
+    'FACE_Inv', FACE_Inv;
+    'FACE_Object', FACE_Object;
+    'FACE_UpObj', FACE_UpObj;
+    'MMN_Standard', MMN_Standard;
+    'MMN_PreDev', MMN_PreDev;
+    'MMN_Dev', MMN_Dev;
+    'EMO_Anger', EMO_Anger;
+    'EMO_Calm', EMO_Calm;
+    'EMO_Fearful', EMO_Fearful;
+    'EMO_Happy', EMO_Happy;
+    'total_channels_interpolated', total_channels_interpolated;
+    'avginterp', avginterp;
+    'stdinterp', stdinterp;
+    'rangeinterp', rangeinterp;
+    'stimdev', stimdev;
+    'artifact_detected_all', artifact_detected_all;
+    'stimtracker_interp_applied_all', stimtracker_interp_applied_all;
+    'uniform_detected', uniform_detected;
+    'uniform_time', uniform_time
+};
+
+for i = 1:size(vars,1)
+    fprintf('%-45s %d\n', vars{i,1}, numel(vars{i,2}));
+end
+%
+
 report_table=table(datafile_names', sub_id', Tasks', lineNoise', reference_used_for_faster', faster_bad_channels', ica_preparation_bad_channels', length_ica_data', ...
     total_ICs', ICs_removed', total_epochs_before_artifact_rejection', total_epochs_after_artifact_rejection',FACE_UpInv',FACE_Inv', FACE_Object', FACE_UpObj', MMN_Standard', MMN_PreDev', MMN_Dev', EMO_Anger', EMO_Calm', EMO_Fearful', EMO_Happy', ...
     total_channels_interpolated', avginterp', stdinterp', rangeinterp', stimdev', artifact_detected_all', stimtracker_interp_applied_all', uniform_detected', uniform_time');
