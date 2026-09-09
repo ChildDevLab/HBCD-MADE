@@ -13,25 +13,16 @@ jsonStr = fileread(json_file_name);
 % % Decode the JSON data into a MATLAB struct
 settingsData = jsondecode(jsonStr);
 
-% TM - new check for session label for choosing ERPs
+% TM - session label for choosing ERP settings
 if strcmp(session_label, 'ses-V03')
-
     % choose ses-V03 settings
     s1 = s.ses_V03;
-
-elseif strcmp(session_label, 'ses-V04')
-
+elseif ismember(session_label, {'ses-V04', 'ses-V06'})
     % choose ses-V04 settings
     s1 = s.ses_V04;
-
-elseif ismember(session_label, {'ses-V08', 'ses-P08'})
-
+elseif ismember(session_label, {'ses-V08', 'ses-P08', 'ses-V10', 'ses-P10'})
+    % choose ses-V08 settings
     s1 = s.ses_V08;
-
-elseif ismember(session_label, {'ses-V10', 'ses-P10'})
-
-    s1 = s.ses_V10;
-
 end
 
 %Grab task specific settings

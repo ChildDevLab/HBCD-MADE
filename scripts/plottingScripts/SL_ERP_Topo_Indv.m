@@ -57,12 +57,20 @@ rng_seed     = 0;    % random seed for reproducible surrogate shuffling
 set(0, 'DefaultFigureVisible', 'off'); % only save figures
 
 %% COMPUTE RAW AND Z-SCORED ITC
+
 [raw_plv, freqs] = compute_itc(EEG);
-n_epochs   = EEG.trials;
+
+n_epochs = EEG.trials;
+
 zscore_plv = compute_zscore_itc(EEG, raw_plv, n_iterations, rng_seed);
-plv_table  = make_plv_table(raw_plv, zscore_plv, freqs, EEG.chanlocs);
+
+plv_table = make_plv_table(raw_plv, zscore_plv, freqs, EEG.chanlocs);
+
 writetable(plv_table, fullfile(save_path, sprintf('%s_PLV.csv', subject_ID)));
 
+% Save PLV data
+save(fullfile(save_path, sprintf('%s_PLV.mat', subject_ID)), ...
+    'raw_plv', 'zscore_plv', 'freqs', 'n_epochs');
 
 %% PLOT ITC
 % ITC spectrum (all channels + grand average)

@@ -8,10 +8,10 @@ addpath 'C:\Users\avallora\Box\hbcd\HBCD-MADE\scripts\getLineNoise'
 addpath 'C:\Users\avallora\Box\hbcd\HBCD-MADE\adjusted_adjust_scripts'
 addpath 'C:\Users\avallora\Box\hbcd\HBCD-MADE\scripts'
 
-output_dir_name = 'C:\Users\avallora\Box\hbcd\made_testing\output\alicia_testing\936420_cleanline_test2_1.7.1'; 
-bids_dir = 'C:\Users\avallora\Box\hbcd\made_testing\data\bids\CHCHL0062_936420_V06_bids'; 
-participant_label = 'sub-936420';
-session_label = 'ses-V06';
+output_dir_name = 'C:\Users\avallora\Box\hbcd\made_testing\output\alicia_testing\706763_cleanline_test_1.7.1'; 
+bids_dir = 'C:\Users\avallora\Box\hbcd\made_testing\data\bids\CHCHL0062_936420_V06_bidss'; 
+participant_label = 'sub-706763';
+session_label = 'ses-V04';
 file_extension = '.set';
 json_settings_file = 'C:\Users\avallora\Box\hbcd\HBCD-MADE\proc_settings_HBCD.json';
 
