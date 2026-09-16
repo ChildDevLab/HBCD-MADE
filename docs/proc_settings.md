@@ -474,4 +474,72 @@ The following functionality was added in MADE v.1.7.0 and will be reflected in t
 `stimtracker_artifact_interpolation.m` averages all epochs per task and flags voltage fluctuations >1 µV in two time windows: –10 to 10 ms and 250 to 270 ms. Voltage fluctuations during those time windows have been identified as an artifact originating from the StimTracker device. See the [Central HBCD docs](https://docs.hbcdstudy.org/latest/instruments/eeg/qc/#eeg-quality-control-procedures) for additional details about MADE's StimTracker artifact detection and correction algorithm. 
 
 ### Signal Uniformity Checks
-`run_MADE.m` checks for signal uniformity, which may indicate technical issues during administration. 
+
+`run_MADE.m` checks for signal uniformity by assessing the presence and duration of periods
+within the EEG data where all channels are correlated with each other at .95 or higher
+within 5 second windows. This level of similarity in signal across channels indicates
+potential issues during data collection (see the Central HBCD docs for details about types
+of issues the uniformity code detects). Approximately 5% of files across sessions have
+been identified as having some period of data that is uniform. MADE does not exclude files
+based on uniformity. Instead, in the preprocessingReport.csv, each file is labeled as
+uniform or not and the duration of the uniformity is also reported. In files that are a part of
+DR3, that are identified as having periods of uniformity, the range in duration of
+uniformity is 4.999 - 557.994 seconds.
+
+We recommend that files with &gt; 50% of the task identified as uniform should be visually
+inspected by researchers. We provide a table below of the typical task lengths and the
+duration that would meet this threshold for each task. Sometimes a file is longer than the
+typical task duration due to pausing during data collection. Researchers can choose to
+extract the precise duration of each file to most accurately determine if a file is identified
+as &gt; 50% uniform.
+
+<table>
+    <tr>
+        <th>Task</th>
+        <th>Typical Length</th>
+        <th>&gt; 50% Threshold</th>
+        <th>Can the Task Be Paused?</th>
+    </tr>
+    </tr>
+        <td>FACE</td>
+        <td>270 seconds</td>
+        <td>135 seconds</td>
+        <td>Yes</td>
+    </tr>
+    </tr>
+        <td>MMN (V03)</td>
+        <td>690 seconds</td>
+        <td>345 seconds</td>
+        <td>Yes</td>
+    </tr>
+    </tr>
+        <td>MMN (V04/V06)</td>
+        <td>510 seconds</td>
+        <td>255 seconds</td>
+        <td>Yes</td>
+    </tr>
+    </tr>
+        <td>RS</td>
+        <td>180 seconds</td>
+        <td>90 seconds</td>
+        <td>No</td>
+    </tr>
+    </tr>
+        <td>VEP</td>
+        <td>60 seconds</td>
+        <td>30 seconds</td>
+        <td>No</td>
+    </tr>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+

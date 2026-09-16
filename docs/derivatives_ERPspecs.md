@@ -190,7 +190,7 @@ Subject-level log power values for RS.
 | 1.0 Hz | Sum of natural log power centered at 1 Hz <br>  (within the 0.5hz to 1.5hz freq range) at corresponding electrode site |
 | 2.0 Hz | Sum of natural log power centered at 2 Hz <br>  (within the 1.5hz to 2.5hz freq range) at corresponding electrode site |
 | 3.0 Hz | Sum of natural log power centered at 3 Hz <br>  (within the 2.5hz to 3.5hz freq range) at corresponding electrode site |
-| 50.0 Hz | Sum of absolute power in μV² centered at 50 Hz <br>  (within the 49.5hz to 50.5hz freq range) at corresponding electrode site |
+| 50.0 Hz | Sum of absolute power in μV² centered at 50 Hz <br> (within the 49.5hz to 50.5hz freq range) at corresponding electrode site |
 
 **4- RS Power Spectra .mat Output**: `SUBSES_task-RS_spectra.mat`
 
