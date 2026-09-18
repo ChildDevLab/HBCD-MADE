@@ -9,9 +9,14 @@
 %   into 3 syllable words (1.111 Hz). Neural entrainment to these frequencies is
 %   captured via ITC (technically phase locking value/PLV). 
 %
-%   Each epoch's data is circularly shifted by a random amount across n_surrogate 
-%   iterations to create a null distribution, which is used to calculated 
+%   Each epoch's data is circularly shifted by a random amount across n_surrogate
+%   iterations to create a null distribution, which is used to calculated
 %   Z-scored ITC, which helps control for non-phase-locked broadband power.
+%
+%   A leave-one-epoch-out jackknife estimates how much each individual epoch
+%   contributes to the overall ITC. Because epochs are sequential, ordering the
+%   resulting pseudovalues by epoch gives a time course of entrainment across
+%   the exposure.
 %
 %   PLV spectrum plots are created for both raw and Z-scored ITC. Individual 
 %   channel PLV spectrum data are saved as a .csv file
@@ -30,8 +35,10 @@
 %                            nan_mean.m (should be included in EEGLAB)
 %
 %   CSV output:
-%     *_PLV.csv  - long-format table: Electrode, Frequency, raw_ITC, ZITC
-%     *_ERP.csv  - long-format table: condition, epoch, time_ms, amplitude_uV
+%     *_PLV.csv        - long-format table: Electrode, Frequency, raw_ITC, ZITC
+%     *_ERP.csv        - long-format table: condition, epoch, time_ms, amplitude_uV
+%     *_jackknife.csv  - long-format table: epoch, word_pseudoval, syll_pseudoval,
+%                        word_norm_pseudoval, syll_norm_pseudoval
 %
 %   Plot output (.png):
 %     *_desc-allCh_ITC   - ITC spectrum per channel + grand average
@@ -52,25 +59,18 @@ subject_ID = participant_label;
 cd(save_path)
 
 %% CONFIG
-n_iterations = 10;   % surrogate iterations for ZITC
+n_iterations = 100;  % surrogate iterations for ZITC
 rng_seed     = 0;    % random seed for reproducible surrogate shuffling
-set(0, 'DefaultFigureVisible', 'off'); % only save figures
+
+set(0, 'DefaultFigureVisible', 'off'); % only save figures, don't display them
 
 %% COMPUTE RAW AND Z-SCORED ITC
-
 [raw_plv, freqs] = compute_itc(EEG);
-
-n_epochs = EEG.trials;
-
+n_epochs   = EEG.trials;
 zscore_plv = compute_zscore_itc(EEG, raw_plv, n_iterations, rng_seed);
-
-plv_table = make_plv_table(raw_plv, zscore_plv, freqs, EEG.chanlocs);
-
+plv_table  = make_plv_table(raw_plv, zscore_plv, freqs, EEG.chanlocs);
 writetable(plv_table, fullfile(save_path, sprintf('%s_PLV.csv', subject_ID)));
 
-% Save PLV data
-save(fullfile(save_path, sprintf('%s_PLV.mat', subject_ID)), ...
-    'raw_plv', 'zscore_plv', 'freqs', 'n_epochs');
 
 %% PLOT ITC
 % ITC spectrum (all channels + grand average)
@@ -97,13 +97,17 @@ sgtitle(strcat(subject_ID, ' Z-scored ITC'), 'FontSize', 18, 'FontWeight', 'bold
 saveas(gcf, fullfile(save_path, sprintf('%s_desc-ZITC_topo', subject_ID)), 'png');
 
 
+%% JACKKNIFE ITC TIME COURSE
+jackknife_table = compute_jackknife_itc(EEG, raw_plv, freqs);
+writetable(jackknife_table, fullfile(save_path, sprintf('%s_jackknife.csv', subject_ID)));
 
-%% TEMPORARILY COMMENTING OUT THE ERP ANALYSIS BECAUSE WE ARE USING THE OLD EPOCHING FUNCTION
+
+%% COMMENTING OUT ERP ANALYSIS 
 
 % %% RE-EPOCH AND COMPUTE WORD AND SYLL ERPS
 % [erp_times, avg_syll, avg_word, n_syll, n_word, erp_table] = compute_erp(EEG);
 % writetable(erp_table, fullfile(save_path, sprintf('%s_ERP.csv', subject_ID)));
-% 
+
 % %% PLOT WORD AND SYLLABLE ERP BY CHANNEL
 % plot_erp(erp_times, avg_syll, avg_word, n_syll, n_word, subject_ID);
 % saveas(gcf, fullfile(save_path, sprintf('%s_desc-allCh_ERP', subject_ID)), 'png');
@@ -165,6 +169,57 @@ function plv_table = make_plv_table(raw_plv, zscore_plv, freqs, chanlocs)
         raw_plv(sub2ind(size(raw_plv),     chan_idx(:), freq_idx(:))), ...
         zscore_plv(sub2ind(size(zscore_plv), chan_idx(:), freq_idx(:))), ...
         'VariableNames', {'Electrode', 'Frequency', 'raw_ITC', 'ZITC'});
+end
+
+function jackknife_table = compute_jackknife_itc(EEG, raw_plv, freqs)
+% Leave-one-epoch-out jackknife. For each epoch, ITC is recomputed on the
+% remaining N-1 epochs and turned into a pseudovalue:
+%     psi_i = N * ITC_all - (N-1) * ITC_without_epoch_i
+% A positive pseudovalue means that epoch pulled the overall ITC up (removing
+% it lowers ITC); a negative one means it was disrupting phase coherence.
+% Values are raw PLV units, so they are not comparable across participants.
+    n_epochs  = EEG.trials;
+    word_bin  = nearest_bin(freqs, 1.1111);
+    syll_bin  = nearest_bin(freqs, 3.3333);
+
+    % normalization band: everything up to 5 Hz except word, syllable, harmonics
+    harm_bins = [nearest_bin(freqs, 2.2222) nearest_bin(freqs, 4.4444)];
+    norm_bins = setdiff(find(freqs <= 5), [word_bin syll_bin harm_bins]);
+
+    itc_all  = itc_at_bins(raw_plv, word_bin, syll_bin, norm_bins);
+    itc_jack = zeros(n_epochs, 4);
+
+    fprintf('Jackknifing %d epochs...\n', n_epochs);
+    for epoch = 1:n_epochs
+        fprintf('  Leave-one-out epoch %d / %d\n', epoch, n_epochs);
+        EEG_less        = EEG;
+        EEG_less.data   = EEG.data(:, :, setdiff(1:n_epochs, epoch));
+        EEG_less.trials = n_epochs - 1;
+        [less_plv, ~]   = compute_itc(EEG_less);
+        itc_jack(epoch, :) = itc_at_bins(less_plv, word_bin, syll_bin, norm_bins);
+    end
+
+    pseudovals = n_epochs * itc_all - (n_epochs - 1) * itc_jack;
+
+    jackknife_table = table((1:n_epochs)', ...
+        pseudovals(:, 1), pseudovals(:, 2), pseudovals(:, 3), pseudovals(:, 4), ...
+        'VariableNames', {'epoch', 'word_pseudoval', 'syll_pseudoval', ...
+                          'word_norm_pseudoval', 'syll_norm_pseudoval'});
+end
+
+function itc = itc_at_bins(plv, word_bin, syll_bin, norm_bins)
+% ITC at the word and syllable bins averaged across channels, raw and
+% normalized by subtracting the mean PLV across the whole baseline band
+% (norm_bins: everything up to 5 Hz except the word, syllable and harmonics).
+    norm_plv = mean(plv(:, norm_bins), 2);
+    itc = [mean(plv(:, word_bin)), ...
+           mean(plv(:, syll_bin)), ...
+           mean(plv(:, word_bin) - norm_plv), ...
+           mean(plv(:, syll_bin) - norm_plv)];
+end
+
+function bin = nearest_bin(freqs, target_freq)
+    bin = find(abs(freqs - target_freq) == min(abs(freqs - target_freq)), 1);
 end
 
 % ---- ERP ---------------------------------------------------------------------
