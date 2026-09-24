@@ -35,7 +35,7 @@ See below for the ROIs that are used to compute ERPs. The full list of ROIs can 
     Please note that most ERPs are scored using age-dependent time windows. See "Processing Settings and Configuration" for details.  
 
 ### Task-based ERP Derivatives
-ERPs are computed separately for each task condition in the FACE and MMN task. Note that V06 files are treated the same as V04 files during preprocessing. See tables below for details. 
+ERPs are computed separately for each task condition in the FACE and MMN task. See tables below for details. 
 
 ### FACE Task 
 ERP derivatives for the FACE task contain the following components at the specified time windows and ROIs:
