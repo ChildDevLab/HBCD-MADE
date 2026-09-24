@@ -475,23 +475,9 @@ The following functionality was added in MADE v.1.7.0 and will be reflected in t
 
 ### Signal Uniformity Checks
 
-`run_MADE.m` checks for signal uniformity by assessing the presence and duration of periods
-within the EEG data where all channels are correlated with each other at .95 or higher
-within 5 second windows. This level of similarity in signal across channels indicates
-potential issues during data collection (see the Central HBCD docs for details about types
-of issues the uniformity code detects). Approximately 5% of files across sessions have
-been identified as having some period of data that is uniform. MADE does not exclude files
-based on uniformity. Instead, in the preprocessingReport.csv, each file is labeled as
-uniform or not and the duration of the uniformity is also reported. In files that are a part of
-DR3, that are identified as having periods of uniformity, the range in duration of
-uniformity is 4.999 - 557.994 seconds.
+`run_MADE.m` checks for signal similarity or “uniformity” by assessing the presence and duration of periods within the raw EEG data where all channels are correlated with each other at .95 or higher within 5 second windows with a 1 second step-through. This level of similarity in signal across channels indicates potential issues during data collection (e.g., impedances being left on, or large artifacts or poor connection at the reference or common ground electrode leading to noise across channels; see the [Central HBCD docs](https://docs.hbcdstudy.org/latest/instruments/eeg/qc/#uniformity-detection) for details about types of issues the uniformity code detects). Approximately 5% of files across sessions have been identified as having some period of data that is uniform per file. MADE does not exclude files based on uniformity. Instead, in the preprocessingReport.csv, each file is labeled as having any period of high uniformity (or not) and the duration of the uniformity is also reported. In files that are a part of DR3, that are identified as having periods of uniformity, the range in duration of uniformity is 4.999 - 557.994 seconds. 
 
-We recommend that files with &gt; 50% of the task identified as uniform should be visually
-inspected by researchers. We provide a table below of the typical task lengths and the
-duration that would meet this threshold for each task. Sometimes a file is longer than the
-typical task duration due to pausing during data collection. Researchers can choose to
-extract the precise duration of each file to most accurately determine if a file is identified
-as &gt; 50% uniform.
+The EEG Core reviewed the affected data and plotted duration distributions for affected files. Based on our observations, we recommend that files with &gt; 50% of the task identified as uniform should be visually inspected by researchers and used with caution. We provide a table below of the typical task lengths and the duration that would meet this threshold for each task. Sometimes a file is longer than the typical task duration due to pausing during data collection. Researchers can choose to extract the precise duration of each file to most accurately determine if a file is identified as &gt; 50% uniform. 
 
 <table>
     <tr>
