@@ -18,8 +18,8 @@
 %   resulting pseudovalues by epoch gives a time course of entrainment across
 %   the exposure.
 %
-%   PLV spectrum plots are created for both raw and Z-scored ITC. Individual 
-%   channel PLV spectrum data are saved as a .csv file
+%   ITC spectrum plots are created for both raw and Z-scored ITC. Individual
+%   channel ITC spectrum data are saved as a .csv file
 %
 %   Scalp topography plots are created for ITC and ZITC at the syllable (3.333 Hz) 
 %   and word (1.111 Hz) frequencies
@@ -29,16 +29,22 @@
 %   individual syll/word markers.
 %
 %   Expects workspace variables: output_location, event_struct, run,
-%                                json_settings_file, participant_label, save_path
+%                                json_settings_file, participant_label,
+%                                session_label, save_path
 %
 %   Requires on MATLAB path: EEGLAB, frqa_plvpwr.m, frqa_norm.m, frqa_powernorm.m,
 %                            nan_mean.m (should be included in EEGLAB)
 %
-%   CSV output:
-%     *_PLV.csv        - long-format table: Electrode, Frequency, raw_ITC, ZITC
-%     *_ERP.csv        - long-format table: condition, epoch, time_ms, amplitude_uV
-%     *_jackknife.csv  - long-format table: epoch, word_pseudoval, syll_pseudoval,
-%                        word_norm_pseudoval, syll_norm_pseudoval
+%   CSV output (named from the input .set file, as in computeSME.m and the
+%   other task scripts, so the sub-/ses-/task- entities are preserved):
+%     *_ITC.csv              - long-format table: Electrode, Frequency, raw_ITC, ZITC, ID
+%     *_ERP.csv              - long-format table: condition, epoch, time_ms, amplitude_uV
+%     *_ITCTimeCourse.csv    - entrainment across the exposure using jackknife analysis;
+%                              one row per epoch x electrode: 
+%                              epoch, Electrode, word_pseudoval, syll_pseudoval,
+%                              word_norm_pseudoval, syll_norm_pseudoval, ID
+%     *_ITCSummaryStats.csv  - one row per subject: ID, Visit, NTrials, and whole-scalp
+%                              average ITC / ZITC at the word and syllable rates
 %
 %   Plot output (.png):
 %     *_desc-allCh_ITC   - ITC spectrum per channel + grand average
@@ -62,51 +68,66 @@ cd(save_path)
 n_iterations = 100;  % surrogate iterations for ZITC
 rng_seed     = 0;    % random seed for reproducible surrogate shuffling
 
+% Stimulus rates for the SL stream
+word_freq = 1.111;  % word rate (Hz)
+syll_freq = 3.333;  % syllable rate (Hz)
+
 set(0, 'DefaultFigureVisible', 'off'); % only save figures, don't display them
 
 %% COMPUTE RAW AND Z-SCORED ITC
 [raw_plv, freqs] = compute_itc(EEG);
 n_epochs   = EEG.trials;
 zscore_plv = compute_zscore_itc(EEG, raw_plv, n_iterations, rng_seed);
-plv_table  = make_plv_table(raw_plv, zscore_plv, freqs, EEG.chanlocs);
-writetable(plv_table, fullfile(save_path, sprintf('%s_PLV.csv', subject_ID)));
+plv_table  = make_plv_table(raw_plv, zscore_plv, freqs, EEG.chanlocs, participant_label);
+writetable(plv_table, fullfile(save_path, ...
+    strrep(event_struct.file_names{run}, 'desc-filtered_eeg.set', 'ITC.csv')));
 
 
 %% PLOT ITC
 % ITC spectrum (all channels + grand average)
-plot_itc_spectrum(freqs, raw_plv);
+plot_itc_spectrum(freqs, raw_plv, word_freq, syll_freq);
 title(strcat(subject_ID, ' ITC N epochs = ', num2str(n_epochs)), 'FontSize', 18, 'FontWeight', 'bold', 'Interpreter', 'none');
 ylabel('ITC (PLV)', 'FontSize', 16, 'FontWeight', 'bold');
 saveas(gcf, fullfile(save_path, sprintf('%s_desc-allCh_ITC', subject_ID)), 'png');
 
 % ITC scalp topoplot at word and syllable frequencies
-plot_itc_topoplot(raw_plv, freqs, EEG.chanlocs);
+plot_itc_topoplot(raw_plv, freqs, EEG.chanlocs, word_freq, syll_freq);
 sgtitle(strcat(subject_ID, ' ITC (PLV)'), 'FontSize', 18, 'FontWeight', 'bold', 'Interpreter', 'none');
 saveas(gcf, fullfile(save_path, sprintf('%s_desc-ITC_topo', subject_ID)), 'png');
 
+
 %% PLOT ZITC
 % Z-scored ITC spectrum (all channels + grand average)
-plot_itc_spectrum(freqs, zscore_plv);
+plot_itc_spectrum(freqs, zscore_plv, word_freq, syll_freq);
 title(strcat(subject_ID, ' Z-scored ITC N epochs = ', num2str(n_epochs)), 'FontSize', 18, 'FontWeight', 'bold', 'Interpreter', 'none');
 ylabel('Z-scored ITC', 'FontSize', 16, 'FontWeight', 'bold');
 saveas(gcf, fullfile(save_path, sprintf('%s_desc-allCh_ZITC', subject_ID)), 'png');
 
 % Z-scored ITC scalp topoplot at word and syllable frequencies
-plot_itc_topoplot(zscore_plv, freqs, EEG.chanlocs);
+plot_itc_topoplot(zscore_plv, freqs, EEG.chanlocs, word_freq, syll_freq);
 sgtitle(strcat(subject_ID, ' Z-scored ITC'), 'FontSize', 18, 'FontWeight', 'bold', 'Interpreter', 'none');
 saveas(gcf, fullfile(save_path, sprintf('%s_desc-ZITC_topo', subject_ID)), 'png');
 
 
 %% JACKKNIFE ITC TIME COURSE
-jackknife_table = compute_jackknife_itc(EEG, raw_plv, freqs);
-writetable(jackknife_table, fullfile(save_path, sprintf('%s_jackknife.csv', subject_ID)));
+jackknife_table = compute_jackknife_itc(EEG, raw_plv, freqs, word_freq, syll_freq, participant_label);
+writetable(jackknife_table, fullfile(save_path, ...
+    strrep(event_struct.file_names{run}, 'desc-filtered_eeg.set', 'ITCTimeCourse.csv')));
+
+
+%% SUMMARY STATS
+summary_table = make_summary_table(raw_plv, zscore_plv, freqs, EEG, ...
+    participant_label, session_label, word_freq, syll_freq);
+writetable(summary_table, fullfile(save_path, ...
+    strrep(event_struct.file_names{run}, 'desc-filtered_eeg.set', 'ITCSummaryStats.csv')));
 
 
 %% COMMENTING OUT ERP ANALYSIS 
 
 % %% RE-EPOCH AND COMPUTE WORD AND SYLL ERPS
 % [erp_times, avg_syll, avg_word, n_syll, n_word, erp_table] = compute_erp(EEG);
-% writetable(erp_table, fullfile(save_path, sprintf('%s_ERP.csv', subject_ID)));
+% writetable(erp_table, fullfile(save_path, ...
+%     strrep(event_struct.file_names{run}, 'desc-filtered_eeg.set', 'ERP.csv')));
 
 % %% PLOT WORD AND SYLLABLE ERP BY CHANNEL
 % plot_erp(erp_times, avg_syll, avg_word, n_syll, n_word, subject_ID);
@@ -158,7 +179,7 @@ function zscore_plv = compute_zscore_itc(EEG, raw_plv, n_iterations, rng_seed)
     fprintf('Done. zscore_plv is %d channels x %d frequencies.\n', size(zscore_plv, 1), size(zscore_plv, 2));
 end
 
-function plv_table = make_plv_table(raw_plv, zscore_plv, freqs, chanlocs)
+function plv_table = make_plv_table(raw_plv, zscore_plv, freqs, chanlocs, participant_label)
     elec_names           = {chanlocs.labels};
     n_chan                = numel(elec_names);
     n_freqs               = numel(freqs);
@@ -169,25 +190,28 @@ function plv_table = make_plv_table(raw_plv, zscore_plv, freqs, chanlocs)
         raw_plv(sub2ind(size(raw_plv),     chan_idx(:), freq_idx(:))), ...
         zscore_plv(sub2ind(size(zscore_plv), chan_idx(:), freq_idx(:))), ...
         'VariableNames', {'Electrode', 'Frequency', 'raw_ITC', 'ZITC'});
+    plv_table.ID = repmat({participant_label}, height(plv_table), 1);
 end
 
-function jackknife_table = compute_jackknife_itc(EEG, raw_plv, freqs)
+function jackknife_table = compute_jackknife_itc(EEG, raw_plv, freqs, word_freq, syll_freq, participant_label)
 % Leave-one-epoch-out jackknife. For each epoch, ITC is recomputed on the
 % remaining N-1 epochs and turned into a pseudovalue:
 %     psi_i = N * ITC_all - (N-1) * ITC_without_epoch_i
 % A positive pseudovalue means that epoch pulled the overall ITC up (removing
 % it lowers ITC); a negative one means it was disrupting phase coherence.
-% Values are raw PLV units, so they are not comparable across participants.
-    n_epochs  = EEG.trials;
-    word_bin  = nearest_bin(freqs, 1.1111);
-    syll_bin  = nearest_bin(freqs, 3.3333);
+% Values are raw ITC units, not ZITC 
+    n_epochs   = EEG.trials;
+    elec_names = {EEG.chanlocs.labels};
+    n_chan     = numel(elec_names);
+    word_bin   = nearest_bin(freqs, word_freq);
+    syll_bin   = nearest_bin(freqs, syll_freq);
 
     % normalization band: everything up to 5 Hz except word, syllable, harmonics
-    harm_bins = [nearest_bin(freqs, 2.2222) nearest_bin(freqs, 4.4444)];
+    harm_bins = [nearest_bin(freqs, 2 * word_freq) nearest_bin(freqs, 4 * word_freq)];
     norm_bins = setdiff(find(freqs <= 5), [word_bin syll_bin harm_bins]);
 
-    itc_all  = itc_at_bins(raw_plv, word_bin, syll_bin, norm_bins);
-    itc_jack = zeros(n_epochs, 4);
+    itc_all  = itc_at_bins(raw_plv, word_bin, syll_bin, norm_bins);   % nChan x 4
+    itc_jackknife = zeros(n_chan, n_epochs, 4);
 
     fprintf('Jackknifing %d epochs...\n', n_epochs);
     for epoch = 1:n_epochs
@@ -196,30 +220,55 @@ function jackknife_table = compute_jackknife_itc(EEG, raw_plv, freqs)
         EEG_less.data   = EEG.data(:, :, setdiff(1:n_epochs, epoch));
         EEG_less.trials = n_epochs - 1;
         [less_plv, ~]   = compute_itc(EEG_less);
-        itc_jack(epoch, :) = itc_at_bins(less_plv, word_bin, syll_bin, norm_bins);
+        itc_jackknife(:, epoch, :) = itc_at_bins(less_plv, word_bin, syll_bin, norm_bins);
     end
 
-    pseudovals = n_epochs * itc_all - (n_epochs - 1) * itc_jack;
+    pseudovals = n_epochs * reshape(itc_all, n_chan, 1, 4) - (n_epochs - 1) * itc_jackknife;   % nChan x nEpochs x 4
+    pseudovals = reshape(pseudovals, n_chan * n_epochs, 4);
 
-    jackknife_table = table((1:n_epochs)', ...
+    [chan_idx, epoch_idx] = ndgrid(1:n_chan, 1:n_epochs);
+    jackknife_table = table(epoch_idx(:), elec_names(chan_idx(:))', ...
         pseudovals(:, 1), pseudovals(:, 2), pseudovals(:, 3), pseudovals(:, 4), ...
-        'VariableNames', {'epoch', 'word_pseudoval', 'syll_pseudoval', ...
+        'VariableNames', {'epoch', 'Electrode', 'word_pseudoval', 'syll_pseudoval', ...
                           'word_norm_pseudoval', 'syll_norm_pseudoval'});
+    jackknife_table.ID = repmat({participant_label}, height(jackknife_table), 1);
 end
 
 function itc = itc_at_bins(plv, word_bin, syll_bin, norm_bins)
-% ITC at the word and syllable bins averaged across channels, raw and
-% normalized by subtracting the mean PLV across the whole baseline band
+% Per-channel ITC at the word and syllable bins (nChan x 4), raw and
+% normalized by subtracting each channel's mean PLV across the baseline band
 % (norm_bins: everything up to 5 Hz except the word, syllable and harmonics).
     norm_plv = mean(plv(:, norm_bins), 2);
-    itc = [mean(plv(:, word_bin)), ...
-           mean(plv(:, syll_bin)), ...
-           mean(plv(:, word_bin) - norm_plv), ...
-           mean(plv(:, syll_bin) - norm_plv)];
+    itc = [plv(:, word_bin), ...
+           plv(:, syll_bin), ...
+           plv(:, word_bin) - norm_plv, ...
+           plv(:, syll_bin) - norm_plv];
 end
 
 function bin = nearest_bin(freqs, target_freq)
     bin = find(abs(freqs - target_freq) == min(abs(freqs - target_freq)), 1);
+end
+
+% ---- SUMMARY STATS -----------------------------------------------------------
+
+function summary_table = make_summary_table(raw_plv, zscore_plv, freqs, EEG, ...
+    participant_label, session_label, word_freq, syll_freq)
+% Subject-level summary of SL entrainment, one row per subject. ITC and ZITC 
+% are averaged across all available electrodes at syllable and word frequencies 
+    word_bin = nearest_bin(freqs, word_freq);
+    syll_bin = nearest_bin(freqs, syll_freq);
+
+    summary_table = table( ...
+        string(participant_label), ...
+        string(session_label), ...
+        EEG.trials, ...
+        mean(raw_plv(:,    word_bin)), ...
+        mean(raw_plv(:,    syll_bin)), ...
+        mean(zscore_plv(:, word_bin)), ...
+        mean(zscore_plv(:, syll_bin)), ...
+        'VariableNames', {'ID', 'Visit', 'NTrials', ...
+                          'ITC_word_allCh',  'ITC_syll_allCh', ...
+                          'ZITC_word_allCh', 'ZITC_syll_allCh'});
 end
 
 % ---- ERP ---------------------------------------------------------------------
@@ -255,14 +304,16 @@ end
 
 % ---- Plots -------------------------------------------------------------------
 
-function plot_itc_spectrum(freqs, plv)
+function plot_itc_spectrum(freqs, plv, word_freq, syll_freq)
     avg_plv = mean(plv, 1, 'omitnan');
     itc_fig = figure;
     plot(freqs, plv', 'LineWidth', 0.5);
     hold on;
     plt_avg = plot(freqs, avg_plv, 'k', 'LineWidth', 4);
-    xline(1.1111, '--', 'Word (1.11 Hz)',     'FontSize', 12, 'LabelHorizontalAlignment', 'left');
-    xline(3.3333, '--', 'Syllable (3.33 Hz)', 'FontSize', 12, 'LabelHorizontalAlignment', 'left');
+    xline(word_freq, '--', sprintf('Word (%.3f Hz)', word_freq), ...
+        'FontSize', 12, 'LabelHorizontalAlignment', 'left');
+    xline(syll_freq, '--', sprintf('Syllable (%.3f Hz)', syll_freq), ...
+        'FontSize', 12, 'LabelHorizontalAlignment', 'left');
     set(itc_fig, 'Position', get(0, 'Screensize'));
     xlabel('Frequency (Hz)', 'FontSize', 16, 'FontWeight', 'bold');
     legend_handle = legend(plt_avg, 'Channels Average', 'FontSize', 16);
@@ -272,20 +323,23 @@ function plot_itc_spectrum(freqs, plv)
     hold off;
 end
 
-function plot_itc_topoplot(plv_matrix, freqs, chanlocs, varargin)
+function plot_itc_topoplot(plv_matrix, freqs, chanlocs, word_freq, syll_freq, varargin)
     p = inputParser;
     addRequired(p,  'plv_matrix');
     addRequired(p,  'freqs');
     addRequired(p,  'chanlocs');
+    addRequired(p,  'word_freq');
+    addRequired(p,  'syll_freq');
     addParameter(p, 'maplimits', []);
     addParameter(p, 'colormap',  jet);
-    parse(p, plv_matrix, freqs, chanlocs, varargin{:});
+    parse(p, plv_matrix, freqs, chanlocs, word_freq, syll_freq, varargin{:});
 
     maplimits  = p.Results.maplimits;
     cmap       = p.Results.colormap;
 
-    target_freqs = [1.1111, 3.3333];
-    freq_labels  = {'Word (1.11 Hz)', 'Syllable (3.33 Hz)'};
+    target_freqs = [word_freq, syll_freq];
+    freq_labels  = {sprintf('Word (%.3f Hz)', word_freq), ...
+                    sprintf('Syllable (%.3f Hz)', syll_freq)};
     freq_indices = arrayfun(@(f) find(abs(freqs - f) == min(abs(freqs - f)), 1), target_freqs);
     plv_matrix   = plv_matrix(:, freq_indices);
 
